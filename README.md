@@ -18,4 +18,7 @@ Anstelle von Echtgeld verwenden wir ein **Punktesystem**, um Spieler zu motivier
 # nützlich
 - repo im VS hinzufügen: git clone https://github.com/coan988/student-gambling-site.git
 - npm installieren: https://nodejs.org/
+    - Abhängigheiten im VS Code installieren: npm install
+    - falls npm.ps1 blockiert ist: Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned --> VS Code neustarten
 - Localhost Server starten: npm start
+- Localhost Server beenden: STRG + C

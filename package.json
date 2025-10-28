@@ -1,0 +1,35 @@
+{
+  "name": "student-gambling-site",
+  "version": "1.0.0",
+  "description": "Dieses Projekt ist Teil einer Studienarbeit und zielt darauf ab, eine **Webplattform mit mehreren Minigames** zu entwickeln.  \r Anstelle von Echtgeld verwenden wir ein **Punktesystem**, um Spieler zu motivieren und ein sicheres, faires Spielerlebnis zu schaffen.",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "name": "student-gambling-site",
+    "version": "1.0.0",
+    "description": "",
+    "main": "server.js",
+    "scripts": {
+      "start": "node server.js"
+    },
+    "author": "",
+    "license": "ISC"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/coan988/student-gambling-site.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/coan988/student-gambling-site/issues"
+  },
+  "homepage": "https://github.com/coan988/student-gambling-site#readme",
+  "dependencies": {
+    "express": "^5.1.0"
+  }
+}
