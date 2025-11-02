@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8" />
+<title>🎰 Roulette – Nadel-basiertes Ergebnis</title>
+<style>
+  body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: radial-gradient(circle at center, #004d26, #001a0d);
+    color: white;
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  #game-container {
+    display: flex;
+    width: 100%;
+    padding: 15px;
+  }
+
+  #roulette-container {
+    position: relative;
+    width: 300px;
+    height: 300px;
+  }
+
+  canvas {
+    background: transparent;
+    border-radius: 50%;
+    display: block;
+  }
+
+  .needle {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 5px;
+    height: 120px;
+    background: linear-gradient(#ffd700, #b8860b);
+    transform-origin: bottom center;
+    transform: translate(-50%, -100%) rotate(0deg);
+    border-radius: 3px;
+    box-shadow: 0 0 6px rgba(255,215,0,0.9);
+    pointer-events: none;
+    z-index: 5;
+  }
+
+  #controls {
+    margin-left: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 430px;
+  }
+
+  #numbers {
+    display: grid;
+    grid-template-columns: repeat(9, 1fr);
+    gap: 4px;
+    max-width: 270px;
+  }
+
+  .number {
+    width: 28px;
+    height: 28px;
+    font-size: 13px;
+    line-height: 28px;
+    text-align: center;
+    font-weight: bold;
+    border: 1px solid white;
+    cursor: pointer;
+    border-radius: 4px;
+    user-select: none;
+  }
+
+  .number.red { background: #c00; color: white; }
+  .number.black { background: #000; color: white; }
+  .number.green { background: green; color: white; }
+  .number.selected { outline: 2px solid yellow; }
+
+  #betOptions {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .betType {
+    background: #222;
+    padding: 4px 8px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+
+  .betType.selected {
+    background: #444;
+    outline: 2px solid yellow;
+  }
+
+  select, button {
+    font-size: 15px;
+    padding: 6px;
+    border-radius: 6px;
+    border: none;
+  }
+
+  button {
+    background: #228B22;
+    color: white;
+    cursor: pointer;
+  }
+
+  button[disabled] {
+    background: #5a845a;
+    opacity: 0.8;
+    cursor: default;
+  }
+
+  #result {
+    margin-top: 6px;
+    font-weight: bold;
+    font-size: 16px;
+    min-height: 28px;
+  }
+
+  #balance {
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 4px;
+  }
+</style>
+</head>
+<body>
+<div id="game-container">
+  <div id="roulette-container">
+    <canvas id="roulette" width="300" height="300"></canvas>
+    <div class="needle" id="needle"></div>
+  </div>
+
+  <div id="controls">
+    <h2>Roulette</h2>
+    <div id="balance">💰 Guthaben: 1000</div>
+
+    <div id="numbers"></div>
+
+    <div id="betOptions">
+      <div class="betType" data-type="red">Rot</div>
+      <div class="betType" data-type="black">Schwarz</div>
+      <div class="betType" data-type="even">Gerade</div>
+      <div class="betType" data-type="odd">Ungerade</div>
+    </div>
+
+    <label for="betAmount">Einsatz:</label>
+    <select id="betAmount">
+      <option value="10">10</option>
+      <option value="50">50</option>
+      <option value="100">100</option>
+      <option value="500">500</option>
+    </select>
+
+    <button id="spinBtn">Spin</button>
+    <div id="result"></div>
+  </div>
+</div>
+
+<script>
+const canvas = document.getElementById("roulette");
+const ctx = canvas.getContext("2d");
+const needle = document.getElementById("needle");
+const numbersDiv = document.getElementById("numbers");
+const spinBtn = document.getElementById("spinBtn");
+const resultDiv = document.getElementById("result");
+const balanceDiv = document.getElementById("balance");
+
+const radius = 120;
+
+const wheelOrder = [
+  0,32,15,19,4,21,2,25,17,34,6,
+  27,13,36,11,30,8,23,10,5,24,
+  16,33,1,20,14,31,9,22,18,29,
+  7,28,12,35,3,26
+];
+
+const redSet = new Set([1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36]);
+const colors = {};
+wheelOrder.forEach(n => {
+  if (n === 0) colors[n] = "green";
+  else if (redSet.has(n)) colors[n] = "red";
+  else colors[n] = "black";
+});
+
+let balance = 1000;
+let spinning = false;
+
+/* --- Zeichne Roulette-Scheibe (unverändert) --- */
+function drawWheel() {
+  const cx = canvas.width / 2, cy = canvas.height / 2;
+  const slice = 2 * Math.PI / wheelOrder.length;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // Holzrahmen
+  ctx.beginPath();
+  ctx.arc(cx, cy, radius + 16, 0, 2 * Math.PI);
+  const wood = ctx.createLinearGradient(0, 0, 0, canvas.height);
+  wood.addColorStop(0, "#7b4b26");
+  wood.addColorStop(1, "#2b1508");
+  ctx.fillStyle = wood;
+  ctx.fill();
+
+  for (let i = 0; i < wheelOrder.length; i++) {
+    const start = -Math.PI / 2 + i * slice;
+    const end = start + slice;
+
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.arc(cx, cy, radius, start, end);
+    ctx.closePath();
+    const col = colors[wheelOrder[i]];
+    ctx.fillStyle = col === "red" ? "#c00" : col === "black" ? "#111" : "#0b9a45";
+    ctx.fill();
+
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(start + slice / 2);
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillStyle = "white";
+    ctx.font = "bold 13px Arial";
+    ctx.fillText(wheelOrder[i], radius - 25, 0);
+    ctx.restore();
+  }
+
+  ctx.beginPath();
+  ctx.arc(cx, cy, 50, 0, Math.PI * 2);
+  ctx.fillStyle = "gold";
+  ctx.fill();
+}
+
+/* --- Zahl-Buttons (unverändert) --- */
+function buildNumbers() {
+  wheelOrder.forEach(n => {
+    const div = document.createElement("div");
+    div.className = "number " + colors[n];
+    div.textContent = n;
+    div.dataset.num = n;
+    div.onclick = () => {
+      document.querySelectorAll(".number").forEach(e => e.classList.remove("selected"));
+      document.querySelectorAll(".betType").forEach(e => e.classList.remove("selected"));
+      div.classList.add("selected");
+    };
+    numbersDiv.appendChild(div);
+  });
+}
+
+/* --- Bet-Options (unverändert) --- */
+document.querySelectorAll(".betType").forEach(b => {
+  b.onclick = () => {
+    document.querySelectorAll(".betType").forEach(x => x.classList.remove("selected"));
+    document.querySelectorAll(".number").forEach(x => x.classList.remove("selected"));
+    b.classList.add("selected");
+  };
+});
+
+/* --- Spin-Funktion (Überarbeitet) --- */
+spinBtn.onclick = () => {
+  if (spinning) return;
+  const bet = parseInt(document.getElementById("betAmount").value);
+  if (balance < bet) {
+    resultDiv.textContent = "❌ Nicht genug Guthaben!";
+    return;
+  }
+
+  const selectedNumber = document.querySelector(".number.selected");
+  const selectedType = document.querySelector(".betType.selected");
+
+  if (!selectedNumber && !selectedType) {
+    resultDiv.textContent = "Bitte Zahl oder Kategorie wählen!";
+    return;
+  }
+
+  spinning = true;
+  spinBtn.disabled = true;
+  resultDiv.textContent = "Spinne...";
+  balance -= bet;
+  balanceDiv.textContent = "💰 Guthaben: " + balance;
+
+  // 1. Zufällige Endposition bestimmen
+  const randomAngle = Math.random() * 360; // Ein Winkel zwischen 0 und 360 Grad
+  const fullSpins = 5 * 360;
+  // Die Nadel dreht sich mindestens 5 volle Runden plus den zufälligen Winkel
+  const totalRotation = fullSpins + randomAngle;
+
+  const duration = 4000;
+  const start = performance.now();
+
+  function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
+
+  function frame(now) {
+    const elapsed = now - start;
+    const progress = Math.min(1, elapsed / duration);
+    const eased = easeOutCubic(progress);
+    const current = totalRotation * eased; // Aktueller Rotationswinkel
+    needle.style.transform = `translate(-50%,-100%) rotate(${current}deg)`;
+
+    if (progress < 1) {
+      requestAnimationFrame(frame);
+    } else {
+      // 2. Finale Zahl anhand des tatsächlichen Endwinkels ermitteln (current)
+      const slice = 360 / wheelOrder.length;
+      // Der finale Winkel, bereinigt auf 0-360 Grad
+      // Die Drehung ist im Uhrzeigersinn, aber die Index-Zählung ist gegen den Uhrzeigersinn.
+      // Außerdem zeigt die Nadel nach oben (-90 Grad zur 0-Achse).
+      const finalAngle = (current % 360 + 360) % 360;
+
+      // Wichtig: Die Roulette-Scheibe ist so gezeichnet, dass die Zahl **entgegengesetzt**
+      // zur Nadelposition steht. Die Nadel zeigt nach oben (270° im mathematischen Sinn, 0° im CSS),
+      // und die Sektoren sind gegen den Uhrzeigersinn angeordnet (0 ist im Osten).
+      // Die Logik für die Index-Berechnung muss angepasst werden,
+      // um den tatsächlichen Sektor unter der Nadel zu treffen.
+      
+      // Wir berechnen, wie weit der Rotationswinkel **gegen** die Sektor-Anordnung liegt.
+      // Die Nadel (die oben steht) zeigt auf den Sektor, der um 90 Grad (oder 270 Grad, je nach Zählrichtung) versetzt ist.
+      // Die Formel: (Gesamtwinkel - 90°) % 360 / Scheibensegment-Größe.
+      // Wir nutzen 270 Grad, um die korrekte Position im Array (das bei 0/Osten startet) zu treffen.
+      const adjustedAngle = (finalAngle + 270) % 360;
+      
+      // Math.floor ermittelt den Index des Sektors, auf dem der adjustierte Winkel liegt.
+      const index = Math.floor(adjustedAngle / slice);
+      const finalNumber = wheelOrder[index];
+
+      finishSpin(finalNumber, bet, selectedNumber, selectedType);
+      spinning = false;
+      spinBtn.disabled = false;
+    }
+  }
+
+  requestAnimationFrame(frame);
+};
+
+/* --- Gewinnermittlung (unverändert) --- */
+function finishSpin(num, bet, selNum, selType) {
+  const color = colors[num];
+  let win = 0, msg = `🎯 Zahl: ${num} (${color}) — `;
+
+  if (selNum) {
+    if (parseInt(selNum.dataset.num) === num) {
+      win = bet * 36;
+      msg += "Treffer! Gewinn " + win;
+    } else msg += "verloren.";
+  } else if (selType) {
+    const t = selType.dataset.type;
+    let success = false;
+    if (t === "red" && color === "red") success = true;
+    if (t === "black" && color === "black") success = true;
+    if (t === "even" && num !== 0 && num % 2 === 0) success = true;
+    if (t === "odd" && num !== 0 && num % 2 === 1) success = true;
+    if (success) {
+      win = bet * 2;
+      msg += "richtig! Gewinn " + win;
+    } else msg += "falsch.";
+  }
+
+  balance += win;
+  balanceDiv.textContent = "💰 Guthaben: " + balance;
+  resultDiv.textContent = msg;
+}
+
+/* --- Start (unverändert) --- */
+drawWheel();
+buildNumbers();
+</script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+

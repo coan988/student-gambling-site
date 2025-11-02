@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Blackjack</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: radial-gradient(circle at center, #006633 0%, #00331a 100%);
+      color: white;
+      text-align: center;
+      margin: 0;
+      height: 100vh;
+      overflow: hidden;
+      cursor: default;
+    }
+
+    h1 {
+      font-size: 2.5em;
+      margin-top: 10px;
+    }
+
+    .section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .score {
+      font-size: 1.3em;
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+
+    .hand {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      margin: 10px;
+      padding: 10px;
+      border-radius: 10px;
+      min-height: 160px;
+    }
+
+    .card {
+      width: 100px;
+      height: 145px;
+      background-size: cover;
+      border-radius: 8px;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.5);
+      transition: transform 0.2s;
+    }
+
+    .card:hover {
+      transform: scale(1.05);
+    }
+
+    .back {
+      background-image: url("https://deckofcardsapi.com/static/img/back.png");
+    }
+
+    button {
+      padding: 10px 20px;
+      margin: 10px;
+      font-size: 16px;
+      cursor: pointer;
+      border: none;
+      border-radius: 8px;
+      background-color: #228B22;
+      color: white;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background-color: #32CD32;
+    }
+
+    #result {
+      font-size: 22px;
+      font-weight: bold;
+      margin-top: 20px;
+    }
+
+    #restartHint {
+      font-size: 16px;
+      margin-top: 10px;
+      opacity: 0.8;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <h1>♠ Blackjack ♣</h1>
+
+  <div class="section">
+    <div class="score" id="dealerScore"></div>
+    <div id="dealer" class="hand"></div>
+  </div>
+
+  <div class="section">
+    <div class="score" id="playerScore"></div>
+    <div id="player" class="hand"></div>
+  </div>
+
+  <div>
+    <button id="hitBtn">Hit</button>
+    <button id="standBtn">Stand</button>
+  </div>
+
+  <p id="result"></p>
+  <p id="restartHint">Klicke auf den Hintergrund, um ein neues Spiel zu starten.</p>
+
+  <script>
+    const suits = ["S", "H", "D", "C"];
+    const ranks = ["2","3","4","5","6","7","8","9","10","J","Q","K","A"];
+    let deck = [], player = [], dealer = [], gameOver = false;
+
+    function createDeck() {
+      deck = [];
+      for (let s of suits) {
+        for (let r of ranks) {
+          deck.push({ rank: r, suit: s });
+        }
+      }
+      deck.sort(() => Math.random() - 0.5);
+    }
+
+    function getValue(hand) {
+      let total = 0, aces = 0;
+      for (let card of hand) {
+        if (["J","Q","K"].includes(card.rank)) total += 10;
+        else if (card.rank === "A") { total += 11; aces++; }
+        else total += parseInt(card.rank);
+      }
+      while (total > 21 && aces) {
+        total -= 10;
+        aces--;
+      }
+      return total;
+    }
+
+    function startGame() {
+      createDeck();
+      player = [deck.pop(), deck.pop()];
+      dealer = [deck.pop(), deck.pop()];
+      gameOver = false;
+      document.getElementById("result").textContent = "";
+      document.getElementById("restartHint").style.display = "none";
+      updateDisplay();
+    }
+
+    function cardImage(card) {
+      return `https://deckofcardsapi.com/static/img/${card.rank}${card.suit}.png`;
+    }
+
+    function renderHand(elementId, hand, hideLast = false) {
+      const div = document.getElementById(elementId);
+      div.innerHTML = "";
+      hand.forEach((card, index) => {
+        const img = document.createElement("div");
+        img.classList.add("card");
+        if (hideLast && index === hand.length - 1) {
+          img.classList.add("back");
+        } else {
+          img.style.backgroundImage = `url(${cardImage(card)})`;
+        }
+        div.appendChild(img);
+      });
+    }
+
+    function updateDisplay(showDealer = false) {
+      const dealerScore = document.getElementById("dealerScore");
+      const playerScore = document.getElementById("playerScore");
+
+      if (!showDealer && !gameOver) {
+        dealerScore.textContent = "Dealer: ???";
+        renderHand("dealer", dealer, true);
+      } else {
+        dealerScore.textContent = `Dealer: ${getValue(dealer)}`;
+        renderHand("dealer", dealer, false);
+      }
+
+      playerScore.textContent = `Spieler: ${getValue(player)}`;
+      renderHand("player", player);
+    }
+
+    function hit() {
+      if (gameOver) return;
+      player.push(deck.pop());
+      if (getValue(player) > 21) {
+        document.getElementById("result").textContent = "💥 Bust! Dealer gewinnt!";
+        endGame();
+      } else {
+        updateDisplay();
+      }
+    }
+
+    function stand() {
+      if (gameOver) return;
+      while (getValue(dealer) < 17) {
+        dealer.push(deck.pop());
+      }
+      const pVal = getValue(player);
+      const dVal = getValue(dealer);
+      let result = "";
+      if (dVal > 21 || pVal > dVal) result = "🎉 Spieler gewinnt!";
+      else if (pVal < dVal) result = "😔 Dealer gewinnt!";
+      else result = "🤝 Unentschieden!";
+      document.getElementById("result").textContent = result;
+      endGame();
+    }
+
+    function endGame() {
+      gameOver = true;
+      updateDisplay(true);
+      // Hinweis einblenden
+      const hint = document.getElementById("restartHint");
+      hint.style.display = "block";
+    }
+
+    // Klick auf Hintergrund startet neues Spiel, wenn vorbei
+    document.body.addEventListener("click", (e) => {
+      if (gameOver && !e.target.closest("button") && !e.target.classList.contains("card")) {
+        startGame();
+      }
+    });
+
+    // Event Listeners
+    document.getElementById("hitBtn").addEventListener("click", hit);
+    document.getElementById("standBtn").addEventListener("click", stand);
+
+    // Spiel starten
+    startGame();
+  </script>
+</body>
+</html>
+
+
+
+
+
+

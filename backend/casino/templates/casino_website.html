@@ -1,5 +1,4 @@
 {% load static %}  <!-- ganz oben laden! -->
-
 <!DOCTYPE html>
 <html lang="de">
 <head>
@@ -14,31 +13,26 @@
       font-weight: bold;
       font-style: normal;
     }
-
     body {
       margin: 0;
       padding: 0;
       background-color: #1e1e1e; 
       font-family: 'Dalek Pinpoint', sans-serif;
-      color: white;
+      color: rgb(255, 255, 255);
       text-align: center;
     }
-
     header {
       padding: 40px 0;
     }
-
     h1 {
       margin: 0;
       font-size: 5rem;
       line-height: 1.2;
     }
-
     p {
       font-size: 2rem;
       margin-top: 40px;
     }
-
     .image-container {
       display: flex;
       gap: 100px; 
@@ -46,31 +40,26 @@
       flex-wrap: wrap;
       padding: 80px 0 40px 0; 
     }
-
     .image-box {
       display: flex;
       flex-direction: column;
       align-items: center;
     }
-
     .image-box a {
       text-decoration: none;
     }
-
     .image-box img {
       width: 180px;
       height: 180px;
       border-radius: 50%;
       object-fit: cover;
-      border: 3px solid white;
+      border: 3px solid rgb(28, 87, 3);
       transition: transform 0.3s;
     }
-
     .image-box img:hover {
       transform: scale(1.1);
       cursor: pointer;
     }
-
     .image-box span {
       margin-top: 15px;
       font-family: 'Dalek Pinpoint', sans-serif;
@@ -83,18 +72,16 @@
   <header>
     <h1>Student Gambling Site!</h1>
   </header>
-
   <p>Choose a game to play...</p>
-
   <div class="image-container">
     <div class="image-box">
-      <a href="roulette.html">
+      <a href="{% url 'roulette' %}">
         <img src="{% static 'images/roulette.png' %}" alt="Roulette">
       </a>
       <span>Roulette</span>
     </div>
     <div class="image-box">
-      <a href="blackjack.html">
+      <a href="{% url 'blackjack' %}">
         <img src="{% static 'images/blackjack.png' %}" alt="Blackjack">
       </a>
       <span>Blackjack</span>
@@ -107,13 +94,14 @@
     </div>
     <div class="image-box">
       <a href="baccara.html">
-        <img src="{% static 'images/baccara.png' %}" alt="Baccara">
+        <img src="{% static 'images/baccarat.png' %}" alt="Baccara">
       </a>
-      <span>Baccara</span>
+      <span>Baccarat</span>
     </div>
   </div>
 </body>
 </html>
+
 
 
 
