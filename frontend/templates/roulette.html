@@ -266,79 +266,67 @@ document.querySelectorAll(".betType").forEach(b => {
 });
 
 /* --- Spin-Funktion (Überarbeitet) --- */
+/* --- Spin-Funktion (Nadel landet auf gezogener Zahl) --- */
 spinBtn.onclick = () => {
-  if (spinning) return;
-  const bet = parseInt(document.getElementById("betAmount").value);
-  if (balance < bet) {
-    resultDiv.textContent = "❌ Nicht genug Guthaben!";
-    return;
-  }
+  if (spinning) return;
+  const bet = parseInt(document.getElementById("betAmount").value);
+  if (balance < bet) {
+    resultDiv.textContent = "❌ Nicht genug Guthaben!";
+    return;
+  }
 
-  const selectedNumber = document.querySelector(".number.selected");
-  const selectedType = document.querySelector(".betType.selected");
+  const selectedNumber = document.querySelector(".number.selected");
+  const selectedType = document.querySelector(".betType.selected");
 
-  if (!selectedNumber && !selectedType) {
-    resultDiv.textContent = "Bitte Zahl oder Kategorie wählen!";
-    return;
-  }
+  if (!selectedNumber && !selectedType) {
+    resultDiv.textContent = "Bitte Zahl oder Kategorie wählen!";
+    return;
+  }
 
-  spinning = true;
-  spinBtn.disabled = true;
-  resultDiv.textContent = "Spinne...";
-  balance -= bet;
-  balanceDiv.textContent = "💰 Guthaben: " + balance;
+  spinning = true;
+  spinBtn.disabled = true;
+  resultDiv.textContent = "Spinne...";
+  balance -= bet;
+  balanceDiv.textContent = "💰 Guthaben: " + balance;
 
-  // 1. Zufällige Endposition bestimmen
-  const randomAngle = Math.random() * 360; // Ein Winkel zwischen 0 und 360 Grad
-  const fullSpins = 5 * 360;
-  // Die Nadel dreht sich mindestens 5 volle Runden plus den zufälligen Winkel
-  const totalRotation = fullSpins + randomAngle;
+  // --- 1. Zufällige Zahl auswählen ---
+  const winningIndex = Math.floor(Math.random() * wheelOrder.length);
+  const winningNumber = wheelOrder[winningIndex];
 
-  const duration = 4000;
-  const start = performance.now();
+  // --- 2. Winkel berechnen, auf dem die Nadel landen soll ---
+  const slice = 360 / wheelOrder.length;
+  // Das Roulette ist gegen den Uhrzeigersinn gezeichnet und 0° liegt rechts (Osten),
+  // die Nadel zeigt oben (270°).
+  // Damit die Nadel genau auf die Zahl zeigt, addieren wir 90° zur Differenz.
+  const targetAngle = (winningIndex * slice + 90) % 360;
 
-  function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
+  // --- 3. Animation mit mehreren Umdrehungen ---
+  const fullSpins = 5 * 360; // 5 volle Drehungen
+  const totalRotation = fullSpins + targetAngle;
 
-  function frame(now) {
-    const elapsed = now - start;
-    const progress = Math.min(1, elapsed / duration);
-    const eased = easeOutCubic(progress);
-    const current = totalRotation * eased; // Aktueller Rotationswinkel
-    needle.style.transform = `translate(-50%,-100%) rotate(${current}deg)`;
+  const duration = 4000;
+  const start = performance.now();
 
-    if (progress < 1) {
-      requestAnimationFrame(frame);
-    } else {
-      // 2. Finale Zahl anhand des tatsächlichen Endwinkels ermitteln (current)
-      const slice = 360 / wheelOrder.length;
-      // Der finale Winkel, bereinigt auf 0-360 Grad
-      // Die Drehung ist im Uhrzeigersinn, aber die Index-Zählung ist gegen den Uhrzeigersinn.
-      // Außerdem zeigt die Nadel nach oben (-90 Grad zur 0-Achse).
-      const finalAngle = (current % 360 + 360) % 360;
+  function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
 
-      // Wichtig: Die Roulette-Scheibe ist so gezeichnet, dass die Zahl **entgegengesetzt**
-      // zur Nadelposition steht. Die Nadel zeigt nach oben (270° im mathematischen Sinn, 0° im CSS),
-      // und die Sektoren sind gegen den Uhrzeigersinn angeordnet (0 ist im Osten).
-      // Die Logik für die Index-Berechnung muss angepasst werden,
-      // um den tatsächlichen Sektor unter der Nadel zu treffen.
-      
-      // Wir berechnen, wie weit der Rotationswinkel **gegen** die Sektor-Anordnung liegt.
-      // Die Nadel (die oben steht) zeigt auf den Sektor, der um 90 Grad (oder 270 Grad, je nach Zählrichtung) versetzt ist.
-      // Die Formel: (Gesamtwinkel - 90°) % 360 / Scheibensegment-Größe.
-      // Wir nutzen 270 Grad, um die korrekte Position im Array (das bei 0/Osten startet) zu treffen.
-      const adjustedAngle = (finalAngle + 270) % 360;
-      
-      // Math.floor ermittelt den Index des Sektors, auf dem der adjustierte Winkel liegt.
-      const index = Math.floor(adjustedAngle / slice);
-      const finalNumber = wheelOrder[index];
+  function frame(now) {
+    const elapsed = now - start;
+    const progress = Math.min(1, elapsed / duration);
+    const eased = easeOutCubic(progress);
+    const current = totalRotation * eased;
+    needle.style.transform = `translate(-50%,-100%) rotate(${current}deg)`;
 
-      finishSpin(finalNumber, bet, selectedNumber, selectedType);
-      spinning = false;
-      spinBtn.disabled = false;
-    }
-  }
+    if (progress < 1) {
+      requestAnimationFrame(frame);
+    } else {
+      // Nach der Drehung das tatsächliche Ergebnis anzeigen
+      finishSpin(winningNumber, bet, selectedNumber, selectedType);
+      spinning = false;
+      spinBtn.disabled = false;
+    }
+  }
 
-  requestAnimationFrame(frame);
+  requestAnimationFrame(frame);
 };
 
 /* --- Gewinnermittlung (unverändert) --- */

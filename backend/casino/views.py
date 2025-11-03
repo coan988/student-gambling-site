@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.urls import reverse
+
 
 # Startseite
 def casino_starting_page(request):
