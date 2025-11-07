@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Student Gambling Site</title>
+  <style>
+    @font-face {
+      font-family: 'Dalek Pinpoint';
+      src: url("fonts/DalekPinpointBold.woff2") format('woff2'),
+           url("fonts/DalekPinpointBold.woff") format('woff');
+      font-weight: bold;
+      font-style: normal;
+    }
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #1e1e1e;
+      font-family: 'Dalek Pinpoint', sans-serif;
+      color: #fff;
+      text-align: center;
+    }
+    header {
+      padding: 40px 0;
+      position: relative;
+    }
+    h1 {
+      margin: 0;
+      font-size: 5rem;
+      line-height: 1.2;
+    }
+    #username-display {
+      position: absolute;
+      right: 30px;
+      top: 25px;
+      font-size: 1.5rem;
+      color: #1abc9c;
+    }
+    #logout-btn {
+      position: absolute;
+      right: 30px;
+      top: 60px;
+      font-size: 1rem;
+      background: #444;
+      color: white;
+      border: none;
+      padding: 6px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: none;
+    }
+    #logout-btn:hover {
+      background-color: #1abc9c;
+    }
+    p {
+      font-size: 2rem;
+      margin-top: 40px;
+    }
+    .image-container {
+      display: flex;
+      gap: 100px;
+      justify-content: center;
+      flex-wrap: wrap;
+      padding: 80px 0 40px 0;
+    }
+    .image-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      opacity: 0.5;
+      pointer-events: none;
+      transition: opacity 0.3s;
+    }
+    .image-box.enabled {
+      opacity: 1;
+      pointer-events: all;
+    }
+    .image-box a img, .image-box img {
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid rgb(28, 87, 3);
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    .image-box a img:hover {
+      transform: scale(1.1);
+      cursor: pointer;
+      box-shadow: 0 0 20px #1abc9c;
+    }
+    .image-box span {
+      margin-top: 15px;
+      color: white;
+      font-size: 1.2rem;
+    }
+
+    /* Registrierung */
+    .register-container {
+      margin-top: 60px;
+      background-color: #222;
+      display: inline-block;
+      padding: 20px 40px;
+      border-radius: 15px;
+      box-shadow: 0 0 10px #1abc9c;
+    }
+    .register-container input {
+      display: block;
+      width: 100%;
+      margin: 10px 0;
+      padding: 10px;
+      font-size: 1rem;
+      border: none;
+      border-radius: 8px;
+    }
+    .register-container button {
+      background-color: #1abc9c;
+      color: white;
+      font-size: 1.2rem;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .register-container button:hover {
+      background-color: #159d82;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Student Gambling Site!</h1>
+    <div id="username-display"></div>
+    <div id="points-display" style="position:absolute; right:30px; top:90px; font-size:1.2rem; color:#f0c330;"></div> <!-- Punkte-Anzeige -->
+    <button id="logout-btn">Logout</button>
+  </header>
+
+  <p>Choose a game to play...</p>
+
+  <div class="image-container">
+    <div class="image-box">
+      <a href="games/roulette.html">
+        <img src="images_starting_page/roulette.png" alt="Roulette" />
+      </a>
+      <span>Roulette</span>
+    </div>
+    <div class="image-box">
+      <a href="games/blackjack.html">
+        <img src="images_starting_page/blackjack.png" alt="Blackjack" />
+      </a>
+      <span>Blackjack</span>
+    </div>
+    <div class="image-box">
+      <img src="images_starting_page/poker.png" alt="Poker" />
+      <span>Poker</span>
+    </div>
+    <div class="image-box">
+      <img src="images_starting_page/baccarat.png" alt="Baccara" />
+      <span>Baccarat</span>
+    </div>
+  </div>
+
+  <!-- Registrierung -->
+  <div id="register-section" class="register-container">
+    <h2>Registriere dich, um zu spielen!</h2>
+    <form id="registerForm">
+      <input type="text" name="username" placeholder="Benutzername" required />
+      <input type="email" name="email" placeholder="E-Mail" required />
+      <input type="password" name="password" placeholder="Passwort" required />
+      <button type="submit">Registrieren</button>
+    </form>
+  </div>
+
+  <!-- Anmeldung -->
+<div id="login-section" class="register-container" style="display:none;">
+  <h2>Bereits registriert? Melde dich an!</h2>
+  <form id="loginForm">
+    <input type="text" name="username" placeholder="Benutzername" required />
+    <input type="password" name="password" placeholder="Passwort" required />
+    <button type="submit">Login</button>
+  </form>
+</div>
+
+<script>
+  // 🔹 CSRF-Cookie vom Server anfordern (beim Start)
+fetch("http://localhost:8000/api/casino/session/", { credentials: "include" });
+
+  // 🔹 CSRF-Token aus Cookie holen
+  function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
+  }
+
+  const registerSection = document.getElementById("register-section");
+  const loginSection = document.getElementById("login-section");
+  const usernameDisplay = document.getElementById("username-display");
+  const logoutBtn = document.getElementById("logout-btn");
+  const imageBoxes = document.querySelectorAll(".image-box");
+
+  function enableGames() {
+    imageBoxes.forEach(box => box.classList.add("enabled"));
+  }
+
+  function disableGames() {
+    imageBoxes.forEach(box => box.classList.remove("enabled"));
+  }
+
+const pointsDisplay = document.getElementById("points-display");
+
+  // 🔹 Session prüfen beim Laden
+  async function checkSession() {
+    try {
+      const res = await fetch("http://localhost:8000/api/casino/session/", {
+        credentials: "include"
+      });
+      const data = await res.json();
+
+      if (data.authenticated) {
+        usernameDisplay.textContent = "👤 " + data.user.username;
+        pointsDisplay.textContent = "💰 " + data.user.points + " Punkte";
+        registerSection.style.display = "none";
+        loginSection.style.display = "none";
+        logoutBtn.style.display = "inline-block";
+        enableGames();
+      } else {
+        usernameDisplay.textContent = "";
+        pointsDisplay.textContent = "";
+        registerSection.style.display = "inline-block";
+        loginSection.style.display = "inline-block";
+        logoutBtn.style.display = "none";
+        disableGames();
+      }
+    } catch (err) {
+      console.error("Fehler beim Prüfen der Session:", err);
+    }
+  }
+
+  checkSession();
+
+  // 🔹 Registrierung
+  document.getElementById("registerForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const formData = Object.fromEntries(new FormData(e.target));
+
+    try {
+      const response = await fetch("http://localhost:8000/api/casino/register/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": getCookie("csrftoken")
+        },
+        credentials: "include",
+        body: JSON.stringify(formData)
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        alert("Willkommen, " + data.user.username + "!");
+        checkSession();
+      } else {
+        alert("Fehler: " + (data.error || "Unbekannter Fehler"));
+      }
+    } catch (err) {
+      alert("Serverfehler: " + err.message);
+    }
+  });
+
+  // 🔹 Login
+  document.getElementById("loginForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const formData = Object.fromEntries(new FormData(e.target));
+
+    try {
+      const response = await fetch("http://localhost:8000/api/casino/login/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": getCookie("csrftoken")
+        },
+        credentials: "include",
+        body: JSON.stringify(formData)
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        alert("Willkommen zurück, " + data.user.username + "!");
+        checkSession();
+      } else {
+        alert("Fehler: " + (data.error || "Ungültige Anmeldedaten"));
+      }
+    } catch (err) {
+      alert("Serverfehler: " + err.message);
+    }
+  });
+
+  // 🔹 Logout (mit CSRF-Token)
+  logoutBtn.addEventListener("click", async () => {
+    const csrftoken = getCookie('csrftoken');
+    try {
+      const res = await fetch("http://localhost:8000/api/casino/logout/", {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "X-CSRFToken": csrftoken
+        }
+      });
+      if (res.ok) {
+        alert("Logout erfolgreich.");
+        checkSession();
+      } else {
+        console.error("Logout fehlgeschlagen.", res.status);
+      }
+    } catch (err) {
+      console.error("Fehler beim Logout:", err);
+    }
+  });
+
+</script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
