@@ -1,0 +1,39 @@
+# Python virtuelle Environments
+venv/
+env/
+.venv/
+.env/
+
+# Python Bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Django spezifisch
+*.log
+*.pot
+*.pyc
+db.sqlite3
+db.sqlite3-journal
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment Variablen (Secrets!)
+.env
+*.env
+
+# IDE und Editor Dateien
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Betriebssystem Dateien
+.DS_Store
+Thumbs.db
