@@ -12,12 +12,39 @@
       margin: 0;
       height: 100vh;
       overflow: hidden;
-      cursor: default;
+      position: relative;
     }
 
     h1 {
       font-size: 2.5em;
       margin-top: 10px;
+    }
+
+    #pointsDisplay {
+      position: absolute;
+      top: 20px;
+      right: 25px;
+      font-size: 1.3rem;
+      color: #ffd700;
+      font-weight: bold;
+    }
+
+    #backBtn {
+      position: absolute;
+      top: 20px;
+      left: 25px;
+      background-color: #444;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background 0.3s;
+    }
+
+    #backBtn:hover {
+      background-color: #1abc9c;
     }
 
     .section {
@@ -53,10 +80,6 @@
       transition: transform 0.2s;
     }
 
-    .card:hover {
-      transform: scale(1.05);
-    }
-
     .back {
       background-image: url("https://deckofcardsapi.com/static/img/back.png");
     }
@@ -69,7 +92,7 @@
       border: none;
       border-radius: 8px;
       background-color: #228B22;
-      color: rgb(255, 255, 255);
+      color: white;
       transition: background 0.3s;
     }
 
@@ -82,17 +105,12 @@
       font-weight: bold;
       margin-top: 20px;
     }
-
-    #restartHint {
-      font-size: 16px;
-      margin-top: 10px;
-      opacity: 0.8;
-      display: none;
-    }
   </style>
 </head>
 <body>
   <h1>♠ Blackjack ♣</h1>
+  <button id="backBtn" onclick="window.location.href='../starting_page.html'">⬅️ Zurück</button>
+  <div id="pointsDisplay">Punkte: –</div>
 
   <div class="section">
     <div class="score" id="dealerScore"></div>
@@ -105,134 +123,198 @@
   </div>
 
   <div>
-    <button id="hitBtn">Hit</button>
-    <button id="standBtn">Stand</button>
+    <button id="startBtn">🎰 Spiel starten</button>
+    <button id="hitBtn" disabled>Hit</button>
+    <button id="standBtn" disabled>Stand</button>
   </div>
 
+<!--Button für einsatz nur design-->
+<div id="betContainer" style="margin-top: 20px;">
+  <label for="betInput">💰 Einsatz:</label>
+  <input id="betInput" type="number" min="1" value="10" style="width:80px; padding:5px; border-radius:5px; border:none; text-align:center;">
+</div>
+
+
   <p id="result"></p>
-  <p id="restartHint">Klicke auf den Hintergrund, um ein neues Spiel zu starten.</p>
 
-  <script>
-    const suits = ["S", "H", "D", "C"];
-    const ranks = ["2","3","4","5","6","7","8","9","10","J","Q","K","A"];
-    let deck = [], player = [], dealer = [], gameOver = false;
+<script>
+  const API_BASE = "http://localhost:8000/api/casino";
+  const pointsDisplay = document.getElementById("pointsDisplay");
 
-    function createDeck() {
-      deck = [];
-      for (let s of suits) {
-        for (let r of ranks) {
-          deck.push({ rank: r, suit: s });
-        }
-      }
-      deck.sort(() => Math.random() - 0.5);
+  function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(";").shift();
+  }
+
+  // Punkte laden
+  async function loadPoints() {
+    const res = await fetch(`${API_BASE}/session/`, { credentials: "include" });
+    const data = await res.json();
+    if (data.authenticated) {
+      pointsDisplay.textContent = `💰 ${data.user.points} Punkte`;
+      // Punkte-Limit für Einsatzfeld
+      const betInput = document.getElementById("betInput");
+      if (betInput) betInput.max = data.user.points;
+    }
+  }
+  loadPoints();
+
+  // Echtzeit-Update per WebSocket
+  const ws = new WebSocket("ws://localhost:8000/ws/points/");
+  ws.onmessage = (event) => {
+    const data = JSON.parse(event.data);
+    if (data.type === "points_update") {
+      pointsDisplay.textContent = `💰 ${data.points} Punkte`;
+      const betInput = document.getElementById("betInput");
+      if (betInput) betInput.max = data.points;
+    }
+  };
+
+  let player = [];
+  let dealer = [];
+  let bet = 0;
+  let gameRunning = false;
+
+  const dealerScore = document.getElementById("dealerScore");
+  const playerScore = document.getElementById("playerScore");
+  const resultText = document.getElementById("result");
+
+  function cardImage(card) {
+    if (card.rank === "?" || card.suit === "back") {
+      return "https://deckofcardsapi.com/static/img/back.png";
+    }
+    return `https://deckofcardsapi.com/static/img/${card.rank}${card.suit}.png`;
+  }
+
+  function renderHand(elementId, hand) {
+    const div = document.getElementById(elementId);
+    div.innerHTML = "";
+    hand.forEach(card => {
+      const img = document.createElement("div");
+      img.classList.add("card");
+      img.style.backgroundImage = `url(${cardImage(card)})`;
+      div.appendChild(img);
+    });
+  }
+
+  function getValue(hand) {
+    let total = 0, aces = 0;
+    for (let c of hand) {
+      if (["J","Q","K"].includes(c.rank)) total += 10;
+      else if (c.rank === "A") { total += 11; aces++; }
+      else if (c.rank !== "?") total += parseInt(c.rank);
+    }
+    while (total > 21 && aces--) total -= 10;
+    return total;
+  }
+
+  function updateDisplay(showDealer = false) {
+    dealerScore.textContent = showDealer ? `Dealer: ${getValue(dealer)}` : "Dealer: ???";
+    playerScore.textContent = `Spieler: ${getValue(player)}`;
+    renderHand("dealer", dealer);
+    renderHand("player", player);
+  }
+
+  // 🎰 Spiel starten
+  document.getElementById("startBtn").onclick = async () => {
+    const betInput = document.getElementById("betInput");
+    const inputBet = parseInt(betInput.value);
+
+    if (!inputBet || inputBet <= 0) {
+      alert("Bitte einen gültigen Einsatz eingeben!");
+      return;
     }
 
-    function getValue(hand) {
-      let total = 0, aces = 0;
-      for (let card of hand) {
-        if (["J","Q","K"].includes(card.rank)) total += 10;
-        else if (card.rank === "A") { total += 11; aces++; }
-        else total += parseInt(card.rank);
-      }
-      while (total > 21 && aces) {
-        total -= 10;
-        aces--;
-      }
-      return total;
+    // Falls kein laufendes Spiel -> neuen Einsatz übernehmen
+    if (!gameRunning || inputBet !== bet) {
+      bet = inputBet;
     }
 
-    function startGame() {
-      createDeck();
-      player = [deck.pop(), deck.pop()];
-      dealer = [deck.pop(), deck.pop()];
-      gameOver = false;
-      document.getElementById("result").textContent = "";
-      document.getElementById("restartHint").style.display = "none";
-      updateDisplay();
-    }
-
-    function cardImage(card) {
-      return `https://deckofcardsapi.com/static/img/${card.rank}${card.suit}.png`;
-    }
-
-    function renderHand(elementId, hand, hideLast = false) {
-      const div = document.getElementById(elementId);
-      div.innerHTML = "";
-      hand.forEach((card, index) => {
-        const img = document.createElement("div");
-        img.classList.add("card");
-        if (hideLast && index === hand.length - 1) {
-          img.classList.add("back");
-        } else {
-          img.style.backgroundImage = `url(${cardImage(card)})`;
-        }
-        div.appendChild(img);
-      });
-    }
-
-    function updateDisplay(showDealer = false) {
-      const dealerScore = document.getElementById("dealerScore");
-      const playerScore = document.getElementById("playerScore");
-
-      if (!showDealer && !gameOver) {
-        dealerScore.textContent = "Dealer: ???";
-        renderHand("dealer", dealer, true);
-      } else {
-        dealerScore.textContent = `Dealer: ${getValue(dealer)}`;
-        renderHand("dealer", dealer, false);
-      }
-
-      playerScore.textContent = `Spieler: ${getValue(player)}`;
-      renderHand("player", player);
-    }
-
-    function hit() {
-      if (gameOver) return;
-      player.push(deck.pop());
-      if (getValue(player) > 21) {
-        document.getElementById("result").textContent = "💥 Bust! Dealer gewinnt!";
-        endGame();
-      } else {
-        updateDisplay();
-      }
-    }
-
-    function stand() {
-      if (gameOver) return;
-      while (getValue(dealer) < 17) {
-        dealer.push(deck.pop());
-      }
-      const pVal = getValue(player);
-      const dVal = getValue(dealer);
-      let result = "";
-      if (dVal > 21 || pVal > dVal) result = "🎉 Spieler gewinnt!";
-      else if (pVal < dVal) result = "😔 Dealer gewinnt!";
-      else result = "🤝 Unentschieden!";
-      document.getElementById("result").textContent = result;
-      endGame();
-    }
-
-    function endGame() {
-      gameOver = true;
-      updateDisplay(true);
-      // Hinweis einblenden
-      const hint = document.getElementById("restartHint");
-      hint.style.display = "block";
-    }
-
-    // Klick auf Hintergrund startet neues Spiel, wenn vorbei
-    document.body.addEventListener("click", (e) => {
-      if (gameOver && !e.target.closest("button") && !e.target.classList.contains("card")) {
-        startGame();
-      }
+    const res = await fetch(`${API_BASE}/play-blackjack/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": getCookie("csrftoken")
+      },
+      credentials: "include",
+      body: JSON.stringify({ bet })
     });
 
-    // Event Listeners
-    document.getElementById("hitBtn").addEventListener("click", hit);
-    document.getElementById("standBtn").addEventListener("click", stand);
+    const data = await res.json();
+    if (!res.ok) return alert(data.error || "Fehler beim Spielstart");
 
-    // Spiel starten
-    startGame();
-  </script>
+    player = data.player;
+    dealer = data.dealer;
+    resultText.textContent = "Das Spiel läuft...";
+
+    updateDisplay(false);
+    document.getElementById("hitBtn").disabled = false;
+    document.getElementById("standBtn").disabled = false;
+    document.getElementById("startBtn").disabled = true;
+    betInput.disabled = true; // Einsatz sperren während der Runde
+    gameRunning = true;
+  };
+
+  // 🃏 Hit – Karte ziehen
+  document.getElementById("hitBtn").onclick = async () => {
+    const res = await fetch(`${API_BASE}/blackjack-hit/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": getCookie("csrftoken")
+      },
+      credentials: "include"
+    });
+
+    const data = await res.json();
+    if (!res.ok) return alert(data.error || "Fehler bei Hit");
+
+    player = data.player;
+    dealer = data.dealer;
+    updateDisplay(false);
+
+    if (data.result === "lose") {
+      resultText.textContent = `💥 Überkauft! -${bet} Punkte.`;
+      endRound();
+    }
+  };
+
+  // 🧠 Stand – Dealer spielt
+  document.getElementById("standBtn").onclick = async () => {
+    const res = await fetch(`${API_BASE}/blackjack-stand/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": getCookie("csrftoken")
+      },
+      credentials: "include"
+    });
+
+    const data = await res.json();
+    if (!res.ok) return alert(data.error || "Fehler beim Stand");
+
+    player = data.player;
+    dealer = data.dealer;
+    updateDisplay(true);
+
+    let text = "";
+    if (data.result === "win") text = `🎉 Du gewinnst ${data.payout} Punkte!`;
+    else if (data.result === "lose") text = `😔 Dealer gewinnt. -${bet} Punkte.`;
+    else text = "🤝 Unentschieden. Einsatz zurück.";
+    resultText.textContent = text;
+
+    endRound();
+  };
+
+  function endRound() {
+    document.getElementById("hitBtn").disabled = true;
+    document.getElementById("standBtn").disabled = true;
+    document.getElementById("startBtn").disabled = false;
+    document.getElementById("betInput").disabled = false; // Einsatz wieder freigeben
+    loadPoints();
+    gameRunning = false;
+  }
+</script>
 </body>
 </html>

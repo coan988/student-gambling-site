@@ -36,6 +36,20 @@
       font-size: 1.5rem;
       color: #1abc9c;
     }
+
+/* 🔹 Username klickbar machen */
+#username-display {
+  cursor: pointer;          /* zeigt Handcursor statt Textcursor */
+  user-select: none;        /* verhindert Textmarkierung */
+  transition: color 0.2s, transform 0.2s;
+}
+
+#username-display:hover {
+  color: #16e0b5;           /* etwas helleres Grün beim Hover */
+  transform: scale(1.05);   /* leicht vergrößern für Feedback */
+}
+
+
     #logout-btn {
       position: absolute;
       right: 30px;
@@ -124,6 +138,83 @@
     .register-container button:hover {
       background-color: #159d82;
     }
+
+/* 🔹 Popup-Styling */
+.popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.popup.hidden {
+  display: none;
+}
+
+.popup-content {
+  background: #222;
+  border: 2px solid #1abc9c;
+  border-radius: 12px;
+  padding: 25px 40px;
+  color: #fff;
+  box-shadow: 0 0 20px #1abc9c;
+  text-align: left;
+  min-width: 300px;
+}
+
+.popup-content h3 {
+  margin-top: 0;
+  color: #1abc9c;
+}
+
+#close-popup {
+  margin-top: 15px;
+  background-color: #1abc9c;
+  border: none;
+  color: #fff;
+  border-radius: 8px;
+  padding: 8px 16px;
+  cursor: pointer;
+}
+
+#close-popup:hover {
+  background-color: #159d82;
+}
+
+#leaderboard-btn {
+  position: absolute;
+  right: 135px;
+  top: 22px;
+  font-size: 1.8rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #f0c330;
+  transition: transform 0.2s, color 0.2s;
+}
+
+#leaderboard-btn:hover {
+  transform: scale(1.1);
+  color: #ffd700;
+}
+
+#leaderboard-popup input {
+  width: 100%;
+  padding: 8px;
+  border-radius: 6px;
+  border: none;
+  margin-top: 5px;
+  margin-bottom: 10px;
+  font-size: 1rem;
+}
+
+
   </style>
 </head>
 <body>
@@ -133,7 +224,35 @@
     <div id="username-display"></div>
     <div id="points-display" style="position:absolute; right:30px; top:90px; font-size:1.2rem; color:#f0c330;"></div> <!-- Punkte-Anzeige -->
     <button id="logout-btn">Logout</button>
+    <button id="leaderboard-btn" title="Top Spieler">🏆</button>
+
   </header>
+
+<!-- 🔹 Popup-Fenster für User-Info -->
+<div id="user-info-popup" class="popup hidden">
+  <div class="popup-content">
+    <h3>👤 Benutzerinfo</h3>
+    <p><strong>Username:</strong> <span id="popup-username"></span></p>
+    <p><strong>E-Mail:</strong> <span id="popup-email"></span></p>
+    <p><strong>ID:</strong> <span id="popup-id"></span></p>
+    <button id="close-popup">Schließen</button>
+  </div>
+</div>
+
+<!-- 🔹 Leaderboard-Popup -->
+<div id="leaderboard-popup" class="popup hidden">
+  <div class="popup-content">
+    <h3>🏆 Top 50 Spieler</h3>
+    <input type="text" id="search-player" placeholder="Spieler suchen..." />
+    <table id="leaderboard-table" style="width:100%; margin-top:15px; color:white;">
+      <thead>
+        <tr><th>#</th><th>Username</th><th>Punkte</th></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    <button id="close-leaderboard">Schließen</button>
+  </div>
+</div>
 
   <p>Choose a game to play...</p>
 
@@ -317,6 +436,115 @@ const pointsDisplay = document.getElementById("points-display");
       console.error("Fehler beim Logout:", err);
     }
   });
+
+// 🔹 Live-Updates des Punktestands per WebSocket
+function initPointsWebSocket() {
+  const ws = new WebSocket("ws://localhost:8000/ws/points/");
+
+  ws.onopen = () => console.log("✅ Verbunden mit Punkte-Server");
+
+  ws.onmessage = (event) => {
+    const data = JSON.parse(event.data);
+    if (data.type === "points_update") {
+      const pointsDisplay = document.getElementById("points-display");
+      pointsDisplay.textContent = "💰 " + data.points + " Punkte";
+    }
+  };
+
+  ws.onclose = () => {
+    console.log("⚠️ Verbindung getrennt, versuche erneut in 5s...");
+    setTimeout(initPointsWebSocket, 5000); // automatische Wiederverbindung
+  };
+}
+
+// Verbindung nach Login oder Seitenstart aufbauen
+initPointsWebSocket();
+
+// 🔹 User-Info Popup anzeigen beim Klick auf den Username oder Kopf
+const userInfoPopup = document.getElementById("user-info-popup");
+const popupUsername = document.getElementById("popup-username");
+const popupEmail = document.getElementById("popup-email");
+const popupId = document.getElementById("popup-id");
+const closePopup = document.getElementById("close-popup");
+
+usernameDisplay.addEventListener("click", async () => {
+  try {
+    const res = await fetch("http://localhost:8000/api/casino/session/", {
+      credentials: "include"
+    });
+    const data = await res.json();
+
+    if (data.authenticated) {
+      popupUsername.textContent = data.user.username;
+      popupEmail.textContent = data.user.email;
+      popupId.textContent = data.user.id;
+      userInfoPopup.classList.remove("hidden");
+    } else {
+      alert("Du bist nicht eingeloggt!");
+    }
+  } catch (err) {
+    console.error("Fehler beim Laden der Userdaten:", err);
+  }
+});
+
+closePopup.addEventListener("click", () => {
+  userInfoPopup.classList.add("hidden");
+});
+
+// Optional: Klick außerhalb schließt Popup
+userInfoPopup.addEventListener("click", (e) => {
+  if (e.target === userInfoPopup) {
+    userInfoPopup.classList.add("hidden");
+  }
+});
+
+// 🔹 Leaderboard-Popup-Logik
+const leaderboardBtn = document.getElementById("leaderboard-btn");
+const leaderboardPopup = document.getElementById("leaderboard-popup");
+const closeLeaderboard = document.getElementById("close-leaderboard");
+const leaderboardTable = document.querySelector("#leaderboard-table tbody");
+const searchPlayerInput = document.getElementById("search-player");
+
+async function loadLeaderboard(query = "") {
+  let url = "http://localhost:8000/api/casino/leaderboard/";
+  if (query) {
+    url += `?search=${encodeURIComponent(query)}`;
+  }
+  const res = await fetch(url);
+  const data = await res.json();
+
+  leaderboardTable.innerHTML = "";
+  data.forEach(player => {
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td>${player.rank ? player.rank : "-"}</td>
+      <td>${player.username}</td>
+      <td>${player.points}</td>
+    `;
+    leaderboardTable.appendChild(row);
+  });
+}
+
+leaderboardBtn.addEventListener("click", async () => {
+  await loadLeaderboard();
+  leaderboardPopup.classList.remove("hidden");
+});
+
+closeLeaderboard.addEventListener("click", () => {
+  leaderboardPopup.classList.add("hidden");
+});
+
+leaderboardPopup.addEventListener("click", (e) => {
+  if (e.target === leaderboardPopup) {
+    leaderboardPopup.classList.add("hidden");
+  }
+});
+
+searchPlayerInput.addEventListener("input", async (e) => {
+  const query = e.target.value.trim();
+  await loadLeaderboard(query);
+});
+
 
 </script>
 </body>

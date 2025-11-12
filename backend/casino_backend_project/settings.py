@@ -41,10 +41,12 @@ INSTALLED_APPS = [
     'rest_framework',   # Django REST Framework
     'corsheaders',        # erlaubt Cross-Origin Requests vom Bode-Frontend
     'rest_framework.authtoken',   #optional, falls Token-basierte Authentifizierung verwendet wird
+    'channels',          # für WebSocket-Unterstützung -> dadurch Echtzeit-Funktionalität (Punktestand anzeigen)
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'corsheaders.middleware.CorsMiddleware',  # fügt CORS-Middleware hinzu
     'django.contrib.sessions.middleware.SessionMiddleware',
     'casino_backend_project.middleware.DynamicSameSiteMiddleware',    # Middleware für dynamische SameSite-Einstellungen (siehe middleware.py)
     'django.middleware.common.CommonMiddleware',
@@ -52,12 +54,18 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'corsheaders.middleware.CorsMiddleware',  # fügt CORS-Middleware hinzu
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
 ]
+
+
+ASGI_APPLICATION = "casino_backend_project.asgi.application"  # Async Server Gateway, für Echtzeit notwendig
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {"hosts": [("127.0.0.1", 6379)]},
+    },
+}
+
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",  # Erlaube Anfragen vom Node-Frontend
@@ -147,3 +155,13 @@ AUTH_USER_MODEL = 'casino.CustomUser'
 LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = '/casino/'
 LOGOUT_REDIRECT_URL = 'login'
+
+# ✉️ E-Mail-Konfiguration
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "smtp.gmail.com"          # oder dein SMTP-Server
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = "deine.email@gmail.com"      # deine Absenderadresse
+EMAIL_HOST_PASSWORD = "dein-app-passwort"      # App-Passwort, NICHT dein echtes Login
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
