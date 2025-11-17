@@ -161,14 +161,7 @@ LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = '/casino/'
 LOGOUT_REDIRECT_URL = 'login'
 
-# ✉️ E-Mail-Konfiguration
-EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-EMAIL_HOST = "smtp.gmail.com"          # oder dein SMTP-Server
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = "deine.email@gmail.com"      # deine Absenderadresse
-EMAIL_HOST_PASSWORD = "dein-app-passwort"      # App-Passwort, NICHT dein echtes Login
-DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
 
 SESSION_COOKIE_SAMESITE = 'None'  # Statt 'Lax'
 SESSION_COOKIE_SECURE = True      # Pflicht bei SameSite=None
