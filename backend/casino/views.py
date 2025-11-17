@@ -2,11 +2,13 @@ from django.contrib.auth import authenticate, login, logout, get_user_model
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework import status
-from django.views.decorators.csrf import ensure_csrf_cookie
 from rest_framework.permissions import IsAuthenticated
 from django.db import transaction
 from .utils import send_points_update
 from .game_logic.blackjack import play_blackjack_round, dealer_play, determine_winner
+from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
+from django.middleware.csrf import get_token
+
 
 
 User = get_user_model()
@@ -14,6 +16,7 @@ User = get_user_model()
 
 # 🔹 Registrierung
 @api_view(['POST'])
+@csrf_exempt
 def register(request):
     username = request.data.get('username')
     email = request.data.get('email')
@@ -55,6 +58,7 @@ def register(request):
 
 # 🔹 Login
 @api_view(['POST'])
+@csrf_exempt
 def login_user(request):
     username = request.data.get('username')
     password = request.data.get('password')
@@ -117,7 +121,7 @@ def play_blackjack_view(request):
 
     user = request.user
     from .game_logic.blackjack import play_blackjack_round
-    game = play_blackjack_round() 
+    game = play_blackjack_round()
 
     request.session["blackjack_state"] = {
         "deck": game["deck"],
@@ -265,3 +269,13 @@ def leaderboard_view(request):
         for i, u in enumerate(top_users)
     ]
     return Response(data)
+
+@api_view(['GET'])
+@ensure_csrf_cookie
+def get_csrf_token(request):
+    """
+    Gibt den CSRF-Token explizit zurück, damit das Frontend ihn nutzen kann
+    """
+    return Response({
+        'csrfToken': get_token(request)
+    })

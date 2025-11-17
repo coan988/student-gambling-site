@@ -7,6 +7,7 @@ urlpatterns = [
     path('login/', views.login_user, name='login_user'),
     path('session/', views.session_view, name='check_session'),
     path('logout/', views.logout_user, name='logout_user'),
+    path('csrf/', views.get_csrf_token, name='get_csrf_token'),
     path('play-blackjack/', views.play_blackjack_view, name='play_blackjack'),
     path('blackjack-stand/', views.blackjack_stand, name='blackjack_stand'),
     path('blackjack-hit/', views.blackjack_hit, name='blackjack_hit'),
