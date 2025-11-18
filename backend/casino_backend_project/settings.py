@@ -41,7 +41,7 @@ INSTALLED_APPS = [
     'rest_framework',   # Django REST Framework
     'corsheaders',        # erlaubt Cross-Origin Requests vom Bode-Frontend
     'rest_framework.authtoken',   #optional, falls Token-basierte Authentifizierung verwendet wird
-    'channels',          # für WebSocket-Unterstützung -> dadurch Echtzeit-Funktionalität (Punktestand anzeigen)
+    #'channels',          # für WebSocket-Unterstützung -> dadurch Echtzeit-Funktionalität (Punktestand anzeigen)
 ]
 
 MIDDLEWARE = [
