@@ -23,9 +23,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-e^2dlp(j=qe@m(u1lk^rzo%h!_^jqr6sso)&5n^cvgl()4u)3^'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = ['192.168.178.255', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['michi22.pythonanywhere.com', 'localhost', '127.0.0.1']
 
 
 # Application definition
@@ -45,8 +45,8 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
     'corsheaders.middleware.CorsMiddleware',  # fügt CORS-Middleware hinzu
+    'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'casino_backend_project.middleware.DynamicSameSiteMiddleware',    # Middleware für dynamische SameSite-Einstellungen (siehe middleware.py)
     'django.middleware.common.CommonMiddleware',
@@ -67,8 +67,10 @@ CHANNEL_LAYERS = {
 }
 
 
+CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",  # Erlaube Anfragen vom Node-Frontend
+    "http://localhost:3000",
+    "https://michi22.pythonanywhere.com",
 ]
 
 # Sessions- & CSRF-Konfiguration
@@ -76,6 +78,7 @@ CORS_ALLOW_CREDENTIALS = True  # Erlaube das Senden von Cookies und Authentifizi
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:3000",  # Vertrauenswürdige Quelle für CSRF
 ]
+
 
 
 ROOT_URLCONF = 'casino_backend_project.urls'
@@ -145,6 +148,8 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+STATIC_ROOT = '/home/michi22/student-gambling-site/backend/staticfiles'
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
@@ -158,3 +163,9 @@ LOGOUT_REDIRECT_URL = 'login'
 
 
 
+SESSION_COOKIE_SAMESITE = 'None'  # Statt 'Lax'
+SESSION_COOKIE_SECURE = True      # Pflicht bei SameSite=None
+SESSION_COOKIE_HTTPONLY = True
+
+CSRF_COOKIE_SAMESITE = 'None'
+CSRF_COOKIE_SECURE = True
