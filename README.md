@@ -15,7 +15,20 @@ Anstelle von Echtgeld verwenden wir ein **Punktesystem**, um Spieler zu motivier
 - Michi: Hosting
 - Corvin: Projektleitung
 
-# nützlich
+# Technologische Entscheidungen
+Frontend:
+- React Framework: gute Integration in REST API
+- Vite: Schnelle Entwicklungs-Builds
+Backend:
+- Django-Framework: Hohe Sicherheit durch eingebaute Mechanismen wie CSRF-Protection, Auth-System, Permission-Klassen
+- Django REST Framework: Strukturierte Bereitstellung von REST-APIs
+Datenbank:
+- SQLite: Einfache Anbindung durch Django ORM
+Hosting:
+- Backend: https://michi22.pythonanywhere.com/api/casino/"urls.py"
+- Frontend: https://michi22.pythonanywhere.com/starting_page.html
+
+# Nützlich
 - repo im VS hinzufügen: git clone https://github.com/coan988/student-gambling-site.git
 - npm installieren: https://nodejs.org/
     - Abhängigheiten im VS Code installieren: npm install
