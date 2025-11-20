@@ -1,365 +1,245 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-<meta charset="utf-8" />
-<title>🎰 Roulette – Nadel-basiertes Ergebnis</title>
+<meta charset="UTF-8">
+<title>Casino – Roulette</title>
+
 <style>
-  body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background: radial-gradient(circle at center, #004d26, #001a0d);
-    color: white;
-    display: flex;
-    justify-content: flex-start;
-    align-items: flex-start;
-    height: 100vh;
-    overflow: hidden;
-  }
+    body {
+        margin: 0;
+        padding: 0;
+        background: #121212;
+        color: white;
+        font-family: Arial, sans-serif;
+        text-align: center;
+    }
 
-  #game-container {
-    display: flex;
-    width: 100%;
-    padding: 15px;
-  }
+    .container {
+        max-width: 500px;
+        margin: 40px auto;
+        padding: 20px;
+        background: #1e1e1e;
+        border-radius: 12px;
+        box-shadow: 0px 0px 15px rgba(0,0,0,0.4);
+    }
 
-  #roulette-container {
-    position: relative;
-    width: 300px;
-    height: 300px;
-  }
+    h1 {
+        color: #e0e0e0;
+        margin-bottom: 10px;
+    }
 
-  canvas {
-    background: transparent;
-    border-radius: 50%;
-    display: block;
-  }
+    #points {
+        font-size: 20px;
+        margin-bottom: 25px;
+        color: #f1c40f;
+    }
 
-  .needle {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 5px;
-    height: 120px;
-    background: linear-gradient(#ffd700, #b8860b);
-    transform-origin: bottom center;
-    transform: translate(-50%, -100%) rotate(0deg);
-    border-radius: 3px;
-    box-shadow: 0 0 6px rgba(255,215,0,0.9);
-    pointer-events: none;
-    z-index: 5;
-  }
+    /* Auswahl-Buttons */
+    button {
+        cursor: pointer;
+    }
 
-  #controls {
-    margin-left: 30px;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    width: 430px;
-  }
+    .btn {
+        padding: 12px 18px;
+        margin: 5px;
+        border: none;
+        border-radius: 6px;
+        font-size: 16px;
+        transition: 0.2s;
+    }
+    .btn:hover {
+        opacity: 0.8;
+    }
 
-  #numbers {
-    display: grid;
-    grid-template-columns: repeat(9, 1fr);
-    gap: 4px;
-    max-width: 270px;
-  }
+    .btn-red { background: #e74c3c; }
+    .btn-black { background: #000; color: white; border: 1px solid #555; }
+    .btn-blue { background: #3498db; }
+    .btn-purple { background: #8e44ad; }
+    .btn-green { background: #2ecc71; }
 
-  .number {
-    width: 28px;
-    height: 28px;
-    font-size: 13px;
-    line-height: 28px;
-    text-align: center;
-    font-weight: bold;
-    border: 1px solid white;
-    cursor: pointer;
-    border-radius: 4px;
-    user-select: none;
-  }
+    #number-input {
+        padding: 10px;
+        width: 120px;
+        margin-top: 10px;
+        border-radius: 6px;
+        border: none;
+        text-align: center;
+    }
 
-  .number.red { background: #c00; color: white; }
-  .number.black { background: #000; color: white; }
-  .number.green { background: green; color: white; }
-  .number.selected { outline: 2px solid yellow; }
+    #betAmount {
+        padding: 10px;
+        width: 150px;
+        border-radius: 6px;
+        border: none;
+        text-align: center;
+        margin-top: 10px;
+        font-size: 16px;
+    }
 
-  #betOptions {
-    display: flex;
-    gap: 6px;
-    flex-wrap: wrap;
-  }
+    /* Roulette Wheel */
+    #wheel {
+        margin: 30px auto;
+        width: 220px;
+        height: 220px;
+        border-radius: 50%;
+        border: 6px solid #444;
+        background: url("roulette_wheel.png") center/cover no-repeat;
+        animation-duration: 4s;
+        animation-timing-function: ease-out;
+    }
 
-  .betType {
-    background: #222;
-    padding: 4px 8px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 14px;
-  }
+    @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(1500deg); }
+    }
 
-  .betType.selected {
-    background: #444;
-    outline: 2px solid yellow;
-  }
-
-  select, button {
-    font-size: 15px;
-    padding: 6px;
-    border-radius: 6px;
-    border: none;
-  }
-
-  button {
-    background: #228B22;
-    color: white;
-    cursor: pointer;
-  }
-
-  button[disabled] {
-    background: #5a845a;
-    opacity: 0.8;
-    cursor: default;
-  }
-
-  #result {
-    margin-top: 6px;
-    font-weight: bold;
-    font-size: 16px;
-    min-height: 28px;
-  }
-
-  #balance {
-    font-size: 16px;
-    font-weight: bold;
-    margin-bottom: 4px;
-  }
+    /* Ergebnis-Box */
+    #result-box {
+        background: #252525;
+        padding: 20px;
+        border-radius: 10px;
+        margin-top: 20px;
+        min-height: 70px;
+        font-size: 18px;
+        color: #ecf0f1;
+    }
 </style>
 </head>
 <body>
-<div id="game-container">
-  <div id="roulette-container">
-    <canvas id="roulette" width="300" height="300"></canvas>
-    <div class="needle" id="needle"></div>
-  </div>
 
-  <div id="controls">
-    <h2>Roulette</h2>
-    <div id="balance">💰 Guthaben: 1000</div>
+<div class="container">
+    <h1>🎰 Roulette</h1>
 
-    <div id="numbers"></div>
+    <div id="points">Punkte werden geladen...</div>
 
-    <div id="betOptions">
-      <div class="betType" data-type="red">Rot</div>
-      <div class="betType" data-type="black">Schwarz</div>
-      <div class="betType" data-type="even">Gerade</div>
-      <div class="betType" data-type="odd">Ungerade</div>
+    <h3>Wette auswählen</h3>
+
+    <div>
+        <button class="btn btn-red" onclick="setBet('color','red')">🔴 Rot</button>
+        <button class="btn btn-black" onclick="setBet('color','black')">⚫ Schwarz</button>
     </div>
 
-    <label for="betAmount">Einsatz:</label>
-    <select id="betAmount">
-      <option value="10">10</option>
-      <option value="50">50</option>
-      <option value="100">100</option>
-      <option value="500">500</option>
-    </select>
+    <div>
+        <button class="btn btn-blue" onclick="setBet('even_odd','even')">Gerade</button>
+        <button class="btn btn-purple" onclick="setBet('even_odd','odd')">Ungerade</button>
+    </div>
 
-    <button id="spinBtn">Spin</button>
-    <div id="result"></div>
-  </div>
+    <div>
+        <input id="number-input" type="number" min="0" max="36" placeholder="Zahl 0–36">
+        <button class="btn btn-green" onclick="setNumberBet()">Zahl setzen</button>
+    </div>
+
+    <h3>Einsatz</h3>
+    <input id="betAmount" type="number" value="50" min="1">
+
+    <button class="btn btn-green" style="margin-top: 15px;" onclick="spin()">🎲 Spielen</button>
+
+    <div id="wheel"></div>
+
+    <div id="result-box"></div>
 </div>
 
 <script>
-const canvas = document.getElementById("roulette");
-const ctx = canvas.getContext("2d");
-const needle = document.getElementById("needle");
-const numbersDiv = document.getElementById("numbers");
-const spinBtn = document.getElementById("spinBtn");
-const resultDiv = document.getElementById("result");
-const balanceDiv = document.getElementById("balance");
 
-const radius = 120;
-
-const wheelOrder = [
-  0,32,15,19,4,21,2,25,17,34,6,
-  27,13,36,11,30,8,23,10,5,24,
-  16,33,1,20,14,31,9,22,18,29,
-  7,28,12,35,3,26
-];
-
-const redSet = new Set([1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36]);
-const colors = {};
-wheelOrder.forEach(n => {
-  if (n === 0) colors[n] = "green";
-  else if (redSet.has(n)) colors[n] = "red";
-  else colors[n] = "black";
-});
-
-let balance = 1000;
-let spinning = false;
-
-/* --- Zeichne Roulette-Scheibe (unverändert) --- */
-function drawWheel() {
-  const cx = canvas.width / 2, cy = canvas.height / 2;
-  const slice = 2 * Math.PI / wheelOrder.length;
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-  // Holzrahmen
-  ctx.beginPath();
-  ctx.arc(cx, cy, radius + 16, 0, 2 * Math.PI);
-  const wood = ctx.createLinearGradient(0, 0, 0, canvas.height);
-  wood.addColorStop(0, "#7b4b26");
-  wood.addColorStop(1, "#2b1508");
-  ctx.fillStyle = wood;
-  ctx.fill();
-
-  for (let i = 0; i < wheelOrder.length; i++) {
-    const start = -Math.PI / 2 + i * slice;
-    const end = start + slice;
-
-    ctx.beginPath();
-    ctx.moveTo(cx, cy);
-    ctx.arc(cx, cy, radius, start, end);
-    ctx.closePath();
-    const col = colors[wheelOrder[i]];
-    ctx.fillStyle = col === "red" ? "#c00" : col === "black" ? "#111" : "#0b9a45";
-    ctx.fill();
-
-    ctx.save();
-    ctx.translate(cx, cy);
-    ctx.rotate(start + slice / 2);
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    ctx.fillStyle = "white";
-    ctx.font = "bold 13px Arial";
-    ctx.fillText(wheelOrder[i], radius - 25, 0);
-    ctx.restore();
-  }
-
-  ctx.beginPath();
-  ctx.arc(cx, cy, 50, 0, Math.PI * 2);
-  ctx.fillStyle = "gold";
-  ctx.fill();
+// 🔹 CSRF aus Cookies holen
+function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
 }
 
-/* --- Zahl-Buttons (unverändert) --- */
-function buildNumbers() {
-  wheelOrder.forEach(n => {
-    const div = document.createElement("div");
-    div.className = "number " + colors[n];
-    div.textContent = n;
-    div.dataset.num = n;
-    div.onclick = () => {
-      document.querySelectorAll(".number").forEach(e => e.classList.remove("selected"));
-      document.querySelectorAll(".betType").forEach(e => e.classList.remove("selected"));
-      div.classList.add("selected");
-    };
-    numbersDiv.appendChild(div);
-  });
-}
+const API_BASE = "http://localhost:8000/api/casino";
 
-/* --- Bet-Options (unverändert) --- */
-document.querySelectorAll(".betType").forEach(b => {
-  b.onclick = () => {
-    document.querySelectorAll(".betType").forEach(x => x.classList.remove("selected"));
-    document.querySelectorAll(".number").forEach(x => x.classList.remove("selected"));
-    b.classList.add("selected");
-  };
-});
+let betType = null;
+let betValue = null;
 
-/* --- Spin-Funktion (Überarbeitet) --- */
-/* --- Spin-Funktion (Nadel landet auf gezogener Zahl) --- */
-spinBtn.onclick = () => {
-  if (spinning) return;
-  const bet = parseInt(document.getElementById("betAmount").value);
-  if (balance < bet) {
-    resultDiv.textContent = "❌ Nicht genug Guthaben!";
-    return;
-  }
+// 🔹 Punkte aus backend laden
+async function loadPoints() {
 
-  const selectedNumber = document.querySelector(".number.selected");
-  const selectedType = document.querySelector(".betType.selected");
+    await fetch(`${API_BASE}/session/`, { credentials: "include" });
 
-  if (!selectedNumber && !selectedType) {
-    resultDiv.textContent = "Bitte Zahl oder Kategorie wählen!";
-    return;
-  }
+    const res = await fetch(`${API_BASE}/session/`, { credentials: "include" });
+    const data = await res.json();
 
-  spinning = true;
-  spinBtn.disabled = true;
-  resultDiv.textContent = "Spinne...";
-  balance -= bet;
-  balanceDiv.textContent = "💰 Guthaben: " + balance;
-
-  // --- 1. Zufällige Zahl auswählen ---
-  const winningIndex = Math.floor(Math.random() * wheelOrder.length);
-  const winningNumber = wheelOrder[winningIndex];
-
-  // --- 2. Winkel berechnen, auf dem die Nadel landen soll ---
-  const slice = 360 / wheelOrder.length;
-  // Das Roulette ist gegen den Uhrzeigersinn gezeichnet und 0° liegt rechts (Osten),
-  // die Nadel zeigt oben (270°).
-  // Damit die Nadel genau auf die Zahl zeigt, addieren wir 90° zur Differenz.
-  const targetAngle = (winningIndex * slice + 90) % 360;
-
-  // --- 3. Animation mit mehreren Umdrehungen ---
-  const fullSpins = 5 * 360; // 5 volle Drehungen
-  const totalRotation = fullSpins + targetAngle;
-
-  const duration = 4000;
-  const start = performance.now();
-
-  function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
-
-  function frame(now) {
-    const elapsed = now - start;
-    const progress = Math.min(1, elapsed / duration);
-    const eased = easeOutCubic(progress);
-    const current = totalRotation * eased;
-    needle.style.transform = `translate(-50%,-100%) rotate(${current}deg)`;
-
-    if (progress < 1) {
-      requestAnimationFrame(frame);
+    if (data.authenticated) {
+        document.getElementById("points").innerText = `💰 Punkte: ${data.user.points}`;
     } else {
-      // Nach der Drehung das tatsächliche Ergebnis anzeigen
-      finishSpin(winningNumber, bet, selectedNumber, selectedType);
-      spinning = false;
-      spinBtn.disabled = false;
+        document.getElementById("points").innerText = "Nicht eingeloggt!";
     }
-  }
-
-  requestAnimationFrame(frame);
-};
-
-/* --- Gewinnermittlung (unverändert) --- */
-function finishSpin(num, bet, selNum, selType) {
-  const color = colors[num];
-  let win = 0, msg = `🎯 Zahl: ${num} (${color}) — `;
-
-  if (selNum) {
-    if (parseInt(selNum.dataset.num) === num) {
-      win = bet * 36;
-      msg += "Treffer! Gewinn " + win;
-    } else msg += "verloren.";
-  } else if (selType) {
-    const t = selType.dataset.type;
-    let success = false;
-    if (t === "red" && color === "red") success = true;
-    if (t === "black" && color === "black") success = true;
-    if (t === "even" && num !== 0 && num % 2 === 0) success = true;
-    if (t === "odd" && num !== 0 && num % 2 === 1) success = true;
-    if (success) {
-      win = bet * 2;
-      msg += "richtig! Gewinn " + win;
-    } else msg += "falsch.";
-  }
-
-  balance += win;
-  balanceDiv.textContent = "💰 Guthaben: " + balance;
-  resultDiv.textContent = msg;
 }
 
-/* --- Start (unverändert) --- */
-drawWheel();
-buildNumbers();
+function setBet(type, value) {
+    betType = type;
+    betValue = value;
+    document.getElementById("result-box").innerText = `Gewählt: ${type} = ${value}`;
+}
+
+function setNumberBet() {
+    let number = document.getElementById("number-input").value;
+
+    if (number === "" || number < 0 || number > 36) {
+        alert("Bitte eine gültige Zahl auswählen (0–36)");
+        return;
+    }
+
+    betType = "number";
+    betValue = parseInt(number);
+    document.getElementById("result-box").innerText = `Gewählt: Zahl ${betValue}`;
+}
+
+// 🔹 Animation starten + Backend anfragen
+async function spin() {
+
+    if (!betType || betValue === null) {
+        alert("Bitte zuerst eine Wette auswählen!");
+        return;
+    }
+
+    const stake = parseInt(document.getElementById("betAmount").value);
+    const csrfToken = getCookie("csrftoken");
+
+    // Animation starten
+    const wheel = document.getElementById("wheel");
+    wheel.style.animation = "spin 3.5s ease-out";
+
+    setTimeout(() => {
+        wheel.style.animation = "";
+    }, 3500);
+
+    // Backend request
+    const res = await fetch(`${API_BASE}/play-roulette/`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": csrfToken
+        },
+        body: JSON.stringify({
+            bet_type: betType,
+            number: betValue,
+            amount: stake
+        })
+    });
+
+    const data = await res.json();
+
+    if (data.error) {
+        alert(data.error);
+        return;
+    }
+
+    document.getElementById("result-box").innerHTML = `
+        🎯 Ergebnis: ${data.result_number} (${data.result_color})<br>
+        💵 Gewinn: ${data.win_amount}<br>
+        💰 Neuer Kontostand: ${data.new_points}
+    `;
+
+    loadPoints();
+}
+
+loadPoints();
+
 </script>
+
 </body>
 </html>

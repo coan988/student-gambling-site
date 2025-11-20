@@ -12,4 +12,6 @@ urlpatterns = [
     path('blackjack-stand/', views.blackjack_stand, name='blackjack_stand'),
     path('blackjack-hit/', views.blackjack_hit, name='blackjack_hit'),
     path('leaderboard/', views.leaderboard_view, name='leaderboard_view'),
+    path('play-roulette/', views.play_roulette_view, name='play_roulette'),
+    path('play-baccarat/', views.play_baccarat_view, name='play_baccarat'),
 ]

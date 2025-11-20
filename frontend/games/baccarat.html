@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>Baccarat – Casino</title>
+
+<style>
+    body {
+        margin: 0;
+        background: #0f0f0f;
+        color: white;
+        font-family: Arial, sans-serif;
+        text-align: center;
+    }
+
+    .container {
+        max-width: 600px;
+        margin: 30px auto;
+        padding: 20px;
+        background: #1b1b1b;
+        border-radius: 12px;
+        box-shadow: 0 0 20px rgba(0,0,0,0.7);
+    }
+
+    h1 {
+        margin-bottom: 5px;
+        color: #f1c40f;
+    }
+
+    #points {
+        font-size: 20px;
+        color: #2ecc71;
+        margin-bottom: 15px;
+    }
+
+    /* Buttons */
+    .bet-btn {
+        padding: 12px 16px;
+        margin: 6px;
+        font-size: 16px;
+        cursor: pointer;
+        border-radius: 6px;
+        border: none;
+        transition: 0.2s;
+    }
+
+    .bet-btn:hover { opacity: 0.8; }
+
+    .player-btn  { background: #3498db; }
+    .banker-btn  { background: #e74c3c; }
+    .tie-btn     { background: #8e44ad; }
+
+    #betAmount {
+        padding: 10px;
+        width: 120px;
+        font-size: 18px;
+        border-radius: 6px;
+        border: none;
+        text-align: center;
+        margin: 10px 0;
+    }
+
+    /* Baccarat Table */
+    .table {
+        margin-top: 25px;
+        padding: 20px;
+        background: #145a32;
+        border-radius: 12px;
+        box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+    }
+
+    .hand-container {
+        display: flex;
+        justify-content: space-around;
+        margin-top: 20px;
+    }
+
+    .hand {
+        width: 45%;
+        background: rgba(255,255,255,0.05);
+        padding: 15px;
+        border-radius: 10px;
+    }
+
+    .hand h3 {
+        margin-bottom: 10px;
+    }
+
+    .card {
+        display: inline-block;
+        width: 55px;
+        height: 75px;
+        border-radius: 5px;
+        background: white;
+        color: black;
+        font-weight: bold;
+        margin: 5px;
+        font-size: 22px;
+        line-height: 75px;
+        animation: pop 0.3s ease-out;
+    }
+
+    @keyframes pop {
+        from { transform: scale(0.5); opacity: 0; }
+        to   { transform: scale(1);   opacity: 1; }
+    }
+
+    #result-box {
+        margin-top: 25px;
+        padding: 15px;
+        font-size: 20px;
+        background: #222;
+        border-radius: 10px;
+        min-height: 60px;
+    }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🃏 Baccarat</h1>
+    <div id="points">Lade Punkte...</div>
+
+    <h3>Wette auswählen</h3>
+    <button class="bet-btn player-btn" onclick="setBet('player')">Player</button>
+    <button class="bet-btn banker-btn" onclick="setBet('banker')">Banker</button>
+    <button class="bet-btn tie-btn" onclick="setBet('tie')">Tie</button>
+
+    <h3>Einsatz</h3>
+    <input type="number" id="betAmount" value="50" min="1">
+
+    <br>
+    <button class="bet-btn tie-btn" onclick="playBaccarat()">🎲 Spielen</button>
+
+    <div class="table">
+        <div class="hand-container">
+            <div class="hand" id="player-hand">
+                <h3>Player</h3>
+                <div class="cards"></div>
+            </div>
+            <div class="hand" id="banker-hand">
+                <h3>Banker</h3>
+                <div class="cards"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="result-box"></div>
+</div>
+
+<script>
+// ---------------- CSRF ----------------
+function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(";").shift();
+}
+
+// ---------------- GLOBALS ----------------
+const API_BASE = "http://localhost:8000/api/casino";
+let selectedBet = null;
+
+function setBet(type) {
+    selectedBet = type;
+    document.getElementById("result-box").innerText = `Gewählt: ${type}`;
+}
+
+// ---------------- PUNKTE LADEN ----------------
+async function loadPoints() {
+    await fetch(`${API_BASE}/session/`, { credentials: "include" });
+
+    const res = await fetch(`${API_BASE}/session/`, { credentials: "include" });
+    const data = await res.json();
+
+    if (data.authenticated) {
+        document.getElementById("points").innerText = `💰 Punkte: ${data.user.points}`;
+    }
+}
+
+// ---------------- KARTENZEICHNUNG ----------------
+function renderHand(containerId, cards) {
+    const container = document.querySelector(`#${containerId} .cards`);
+    container.innerHTML = ""; // reset
+
+    cards.forEach(card => {
+        const rank = card % 13; // 0–12
+        const display =
+            rank === 0 ? "A" :
+            rank < 10 ? rank + 1 :
+            ["J","Q","K"][rank - 10];
+
+        const div = document.createElement("div");
+        div.classList.add("card");
+        div.innerText = display;
+
+        container.appendChild(div);
+    });
+}
+
+// ---------------- SPIEL ----------------
+async function playBaccarat() {
+
+    if (!selectedBet) {
+        alert("Bitte eine Wette auswählen!");
+        return;
+    }
+
+    const amount = parseInt(document.getElementById("betAmount").value);
+    const csrf = getCookie("csrftoken");
+
+    const res = await fetch(`${API_BASE}/play-baccarat/`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": csrf
+        },
+        body: JSON.stringify({
+            bet_type: selectedBet,
+            amount: amount
+        })
+    });
+
+    const data = await res.json();
+
+    if (data.error) {
+        alert(data.error);
+        return;
+    }
+
+    // Karten rendern
+    renderHand("player-hand", data.player_hand);
+    renderHand("banker-hand", data.banker_hand);
+
+    // Ergebnis
+    document.getElementById("result-box").innerHTML = `
+        🏆 Gewinner: <strong>${data.winner.toUpperCase()}</strong><br>
+        💵 Gewinn: ${data.win_amount}<br>
+        💰 Neuer Kontostand: ${data.new_points}
+    `;
+
+    loadPoints();
+}
+
+// ---------------- INIT ----------------
+loadPoints();
+</script>
+
+</body>
+</html>

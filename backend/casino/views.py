@@ -8,8 +8,8 @@ from .utils import send_points_update
 from .game_logic.blackjack import play_blackjack_round, dealer_play, determine_winner
 from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
 from django.middleware.csrf import get_token
-
-
+from .game_logic.roulette import play_roulette
+from .game_logic.baccarat import play_baccarat_round
 
 User = get_user_model()
 
@@ -143,10 +143,6 @@ def play_blackjack_view(request):
     })
 
 
-
-
-
-
 # Stand-Logik für Blackjack
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -238,6 +234,9 @@ def blackjack_hit(request):
     })
 
 
+
+
+
 # 🔹 Leaderboard (Top 50 Spieler nach Punkten)
 @api_view(['GET'])
 def leaderboard_view(request):
@@ -278,4 +277,150 @@ def get_csrf_token(request):
     """
     return Response({
         'csrfToken': get_token(request)
+    })
+
+# roulette view
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def play_roulette_view(request):
+    """
+    Roulette spielen:
+    - bet_type: "color", "number", "even_odd"
+    - number: je nach Typ (z.B. "red", "odd", 17)
+    - amount: Einsatz als int
+    """
+
+    user = request.user
+
+    bet_type = request.data.get("bet_type")
+    number   = request.data.get("number")
+    amount   = request.data.get("amount")
+
+    # ----------- VALIDIERUNG -----------
+    if amount is None:
+        return Response({"error": "Einsatz fehlt."}, status=400)
+
+    try:
+        amount = int(amount)
+    except ValueError:
+        return Response({"error": "Einsatz muss eine Zahl sein."}, status=400)
+
+    if amount <= 0:
+        return Response({"error": "Einsatz muss größer als 0 sein."}, status=400)
+
+    if user.points < amount:
+        return Response({"error": "Nicht genug Punkte."}, status=400)
+
+    if bet_type not in ["color", "number", "even_odd"]:
+        return Response({"error": "Ungültiger Wett-Typ."}, status=400)
+
+    # ----------- EINSATZ ABZIEHEN -----------
+    with transaction.atomic():
+        user.points -= amount
+        user.save(update_fields=["points"])
+
+    # ----------- SPIEL AUSFÜHREN -----------
+    try:
+        result_number, result_color, win_amount = play_roulette(
+            bet_type=bet_type,
+            amount=amount,
+            number=number
+        )
+    except Exception as e:
+        return Response({"error": f"Fehler in Spiellogik: {str(e)}"}, status=500)
+
+    # ----------- GEWINN GUTSCHREIBEN -----------
+    with transaction.atomic():
+        user.refresh_from_db()
+        user.points += win_amount
+        user.save(update_fields=["points"])
+
+    # ----------- WEBSOCKET PUSH (optional) -----------
+    try:
+        send_points_update(user.id, user.points)
+    except:
+        pass  # falls kein WebSocket läuft
+
+    # ----------- RESPONSE AN FRONTEND -----------
+    return Response({
+        "result_number": result_number,
+        "result_color": result_color,
+        "win_amount": win_amount,
+        "new_points": user.points
+    }, status=200)
+
+
+# Baccarat view
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def play_baccarat_view(request):
+    """
+    Baccarat spielen:
+    - bet_type: "player", "banker", "tie"
+    - amount: Einsatz als int
+    """
+
+    user = request.user
+
+    bet_type = request.data.get("bet_type")     # "player" / "banker" / "tie"
+    amount   = request.data.get("amount")       # z.B. 50
+
+    # 🔍 Validierung
+    if bet_type not in ["player", "banker", "tie"]:
+        return Response({"error": "Ungültiger Wetteinsatz."}, status=400)
+
+    if amount is None:
+        return Response({"error": "Einsatz fehlt."}, status=400)
+
+    try:
+        amount = int(amount)
+    except ValueError:
+        return Response({"error": "Einsatz muss eine ganze Zahl sein."}, status=400)
+
+    if amount <= 0:
+        return Response({"error": "Einsatz muss größer als 0 sein."}, status=400)
+
+    if user.points < amount:
+        return Response({"error": "Nicht genug Punkte."}, status=400)
+
+    # 💳 Einsatz abziehen
+    with transaction.atomic():
+        user.points -= amount
+        user.save(update_fields=["points"])
+
+    # 🎮 Spiellogik ausführen
+    try:
+        player_hand, banker_hand, winner = play_baccarat_round()
+    except Exception as e:
+        return Response({"error": f"Spiellogik-Fehler: {str(e)}"}, status=500)
+
+    # 💰 Auszahlung bestimmen
+    win_amount = 0
+
+    if bet_type == "player" and winner == "player":
+        win_amount = amount * 2                       # 1:1
+    elif bet_type == "banker" and winner == "banker":
+        win_amount = amount * 2                       # 1:1 ohne Kommission
+    elif bet_type == "tie" and winner == "tie":
+        win_amount = amount * 8                       # 8:1
+
+    # 🏦 Gewinn auszahlen
+    with transaction.atomic():
+        user.refresh_from_db()
+        user.points += win_amount
+        user.save(update_fields=["points"])
+
+    # 📡 Live-Update via WebSocket (wenn vorhanden)
+    try:
+        send_points_update(user.id, user.points)
+    except:
+        pass
+
+    # 📦 Antwort fürs Frontend
+    return Response({
+        "winner": winner,
+        "player_hand": player_hand,
+        "banker_hand": banker_hand,
+        "win_amount": win_amount,
+        "new_points": user.points
     })
