@@ -77,6 +77,7 @@ CORS_ALLOWED_ORIGINS = [
 CORS_ALLOW_CREDENTIALS = True  # Erlaube das Senden von Cookies und Authentifizierungsinformationen
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:3000",  # Vertrauenswürdige Quelle für CSRF
+    "https://michi22.pythonanywhere.com",
 ]
 
 
