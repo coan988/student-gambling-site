@@ -116,7 +116,7 @@ def session_view(request):
 @permission_classes([IsAuthenticated])
 def play_blackjack_view(request):
     bet = int(request.data.get("bet", 0))
-    if bet <= 0:
+    if bet <= 0 and request.user.points >= bet:
         return Response({"error": "Ungültiger Einsatz"}, status=400)
 
     user = request.user

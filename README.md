@@ -27,11 +27,3 @@ Datenbank:
 Hosting:
 - Backend: https://michi22.pythonanywhere.com/api/casino/"urls.py"
 - Frontend: https://michi22.pythonanywhere.com/starting_page.html
-
-# Nützlich
-- repo im VS hinzufügen: git clone https://github.com/coan988/student-gambling-site.git
-- npm installieren: https://nodejs.org/
-    - Abhängigheiten im VS Code installieren: npm install
-    - falls npm.ps1 blockiert ist: Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned --> VS Code neustarten
-- Localhost Server starten: npm start
-- Localhost Server beenden: STRG + C
