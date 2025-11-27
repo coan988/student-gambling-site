@@ -65,7 +65,7 @@
       Abgabedatum: 27.11.2025
     ]
   ]
-  #image("DHBW Logo.png")
+  #image("image/DHBWLogo.png")
 ]
 
 #pagebreak()
@@ -95,6 +95,10 @@
 
 //Abbildungsverzeichnis
 = Abbildungsverzeichnis
+#outline(
+  title: none,
+  target: figure,
+)
 #pagebreak()
 
 //Kopfzeile - Text
@@ -157,12 +161,11 @@
 == Projektmethodik
 #par[Für die Umsetzung des Projekts wurde eine Iterative, agile Projektmethode mit regelmäßigen Meetings gewählt. Diese Methode ermöglicht es, flexibel auf Änderungen zu reagieren und kontinuierlich Verbesserungen vorzunehmen. Durch kurze Entwicklungszyklen konnten Anforderungen schnell umgesetzt und getestet werden, was die Qualität des Endprodukts erhöhte. Die agile Methodik förderte zudem die Zusammenarbeit im Team, da regelmäßige Abstimmungen und Feedbackrunden eingeplant wurden. Insgesamt trug diese Vorgehensweise dazu bei, das Projekt effizient zu steuern und den Fokus auf die wichtigsten Ziele zu legen.]
 == Austausch
-#par[Die Kommunikation und der Austausch im Projektteam erfolgten überwiegend über eine gemeinsame WhatsApp-Gruppe sowie durch persönliche Gespräche im Anschluss an Vorlesungen. Für die kontinuierliche Abstimmung kamen OneNote und verschiedene Funktionen von GitHub zum Einsatz. GitHub ermöglichte es, Kommentare direkt im Code zu hinterlassen und Aufgaben eindeutig zuzuweisen. Zur Planung und Nachverfolgung einzelner Arbeitspakete wurde der „Issues“-Bereich von GitHub genutzt, der eine strukturierte Verwaltung von Milestones, Tasks und Fehlerberichten erlaubte. Auf dieser Grundlage konnten Fortschritte transparent dokumentiert und Prioritäten festgelegt werden. Ergänzend fanden wöchentliche Meetings über Discord statt, um komplexere Fragestellungen zu besprechen, Entscheidungen zu treffen und den direkten Austausch zu stärken. Zentrale Projektdokumente und relevante Informationen wurden in OneNote abgelegt, sodass alle Teammitglieder jederzeit Zugriff auf den aktuellen Wissensstand hatten. Durch die kombinierte Nutzung dieser Werkzeuge wurde eine transparente und effiziente Kommunikation ermöglicht, was wesentlich zur erfolgreichen Zusammenarbeit im Projekt beitrug.]
+#par[Die Kommunikation und der Austausch im Projektteam erfolgten überwiegend über eine gemeinsame WhatsApp-Gruppe sowie durch persönliche Gespräche im Anschluss an Vorlesungen. Für die kontinuierliche Abstimmung kamen OneNote und verschiedene Funktionen von GitHub#footnote("In Github wurde dazu ein öffentliches Repo erstellt: https://github.com/coan988/student-gambling-site.git") zum Einsatz. GitHub ermöglichte es, Kommentare direkt im Code zu hinterlassen und Aufgaben eindeutig zuzuweisen. Zur Planung und Nachverfolgung einzelner Arbeitspakete wurde der „Issues“-Bereich von GitHub genutzt, der eine strukturierte Verwaltung von Milestones, Tasks und Fehlerberichten erlaubte. Auf dieser Grundlage konnten Fortschritte transparent dokumentiert und Prioritäten festgelegt werden. Ergänzend fanden wöchentliche Meetings über Discord statt, um komplexere Fragestellungen zu besprechen, Entscheidungen zu treffen und den direkten Austausch zu stärken. Zentrale Projektdokumente und relevante Informationen wurden in OneNote abgelegt, sodass alle Teammitglieder jederzeit Zugriff auf den aktuellen Wissensstand hatten. Durch die kombinierte Nutzung dieser Werkzeuge wurde eine transparente und effiziente Kommunikation ermöglicht, was wesentlich zur erfolgreichen Zusammenarbeit im Projekt beitrug.]
 == Planung
 #par[Die Planung bildete den organisatorischen Rahmen des Projekts und strukturierte die Zusammenarbeit über den gesamten vierwöchigen Bearbeitungszeitraum. Zu Beginn wurden Zuständigkeiten definiert sowie Anforderungen und Ziele des geplanten Internetauftritts festgelegt. Darauf aufbauend entstand eine Projektstruktur, aus der sich Aufgaben, Meilensteine und zeitliche Prioritäten ableiten ließen. Die anschließende Feinplanung diente als Grundlage für die Ausarbeitung der Rollen, die Erstellung eines realistischen Zeitplans sowie die Festlegung zentraler Meilensteine. Während der Umsetzung wurde diese Planung kontinuierlich überprüft und bei Bedarf angepasst, um den engen Zeitrahmen effizient zu nutzen.]
 === Rollenverteilung
-#par[Die Rollenverteilung im Projektteam wurde klar definiert, um eine effiziente Zusammenarbeit und Verantwortungsübernahme zu gewährleisten. Corvin Annen übernahm die Projektleitung und koordinierte sämtliche organisatorischen Abläufe. Dazu gehörten Terminabsprachen, die Abstimmung zwischen den Entwicklungsbereichen sowie die Überwachung des Projektfortschritts.
-  Elijah Mossmann war für die Backend-Entwicklung verantwortlich. Sein Aufgabenbereich umfasste die Implementierung der API-Strukturen, die Anbindung der Datenbank sowie die Sicherstellung der funktionalen Logik. Timo Manz leitete die Frontend-Entwicklung. Er konzipierte die Benutzeroberfläche, setzte UI-Komponenten um und sorgte dafür, dass Funktionalität und Gestaltung konsistent ineinandergreifen. Michael Zerner betreute Hosting und Deployment. Er kümmerte sich um die Serverumgebung, richtete das Hosting ein und verantwortete die Bereitstellung der Anwendung einschließlich Tests der Live-Version. Diese Rollenverteilung gewährleistete, dass Arbeitsbereiche klar abgegrenzt waren und jedes Mitglied zielgerichtet beitragen konnte.]
+#par[Die Rollenverteilung im Projektteam wurde klar definiert, um eine effiziente Zusammenarbeit und Verantwortungsübernahme zu gewährleisten. Corvin Annen übernahm die Projektleitung und koordinierte sämtliche organisatorischen Abläufe. Dazu gehörten Terminabsprachen, die Abstimmung zwischen den Entwicklungsbereichen sowie die Überwachung des Projektfortschritts. Elijah Mossmann war für die Backend-Entwicklung verantwortlich. Sein Aufgabenbereich umfasste die Implementierung der API-Strukturen, die Anbindung der Datenbank sowie die Sicherstellung der funktionalen Logik. Timo Manz leitete die Frontend-Entwicklung. Er konzipierte die Benutzeroberfläche, setzte UI-Komponenten um und sorgte dafür, dass Funktionalität und Gestaltung konsistent ineinandergreifen. Michael Zerner betreute Hosting und Deployment. Er kümmerte sich um die Serverumgebung, richtete das Hosting ein und verantwortete die Bereitstellung der Anwendung einschließlich Tests der Live-Version. Diese Rollenverteilung gewährleistete, dass Arbeitsbereiche klar abgegrenzt waren und jedes Mitglied zielgerichtet beitragen konnte.]
 === Zeitplan
 #par[Für das vierwöchige Projekt wurde ein komprimierter, aber realistischer Zeitplan ausgearbeitet. Die erste Woche war der Konzeption gewidmet: Klärung der Anforderungen, Auswahl geeigneter Technologien und Festlegung der Systemarchitektur. In den beiden folgenden Wochen erfolgte die parallele Entwicklung von Backend und Frontend, begleitet vom Aufbau der Datenbank und der Implementierung grundlegender UI-Elemente. In der letzten Woche standen Hosting, Integrationstests und Optimierungen im Vordergrund. Regelmäßige Abstimmungen erlaubten es, Fortschritte zu kontrollieren und den Zeitplan situativ anzupassen, ohne die Zieltermine zu gefährden.]
 === Meilensteine
@@ -173,48 +176,62 @@
 == Anforderungen
 #par[Die Anforderungen an den Internetauftritt des Studentencasinos wurden sorgfältig analysiert, um eine benutzerfreundliche, sichere und skalierbare Plattform zu schaffen. Funktionale Anforderungen umfassen die Implementierung eines Punktesystems mit einer fiktiven Spielwährung („Coins“), die Integration verschiedener Minigames zur Coin-Generierung sowie die Anzeige einer Rangliste basierend auf der Coin-Anzahl der Nutzer. Darüber hinaus soll die Plattform modular aufgebaut sein, um zukünftige Erweiterungen und neue Spiele problemlos integrieren zu können. Nicht-funktionale Anforderungen beinhalten Aspekte wie Sicherheit bei der Verwaltung der Spielwährung, Performance-Optimierung für eine reibungslose Nutzererfahrung sowie eine intuitive Benutzeroberfläche. Zusätzlich wurde Wert auf eine klare und ansprechende Gestaltung gelegt, um die Zielgruppe der Studierenden effektiv anzusprechen. Insgesamt sollen diese Anforderungen sicherstellen, dass die Plattform sowohl technisch robust als auch attraktiv für die Nutzer ist.]
 == Technologische Entscheidungen
-#par[Die technologischen Entscheidungen für die Umsetzung des Studentencasinos wurden auf Basis der Anforderungen und Zielsetzungen des Projekts getroffen. Für das Backend wurde das Django-Framework in Python gewählt, da es eine robuste Struktur für die Entwicklung von Webanwendungen bietet und eine einfache Integration mit Datenbanken ermöglicht. Django's integriertes Authentifizierungssystem erleichtert zudem die sichere Verwaltung von Benutzerdaten.@Django Für das Frontend fiel die Wahl auf React, da es eine komponentenbasierte Architektur bietet, die eine flexible und wiederverwendbare Gestaltung der Benutzeroberfläche ermöglicht. Vite wurde als Bundler eingesetzt, um schnelle Entwicklungszyklen und effizientes Build-Management zu gewährleisten. Als Datenbank wurde SQLite verwendet, da es leichtgewichtig ist und sich gut für die Anforderungen des Projekts eignet, mit der Möglichkeit, bei Bedarf auf leistungsfähigere Systeme wie MySQL oder PostgreSQL zu skalieren. Diese technologischen Entscheidungen tragen dazu bei, eine stabile, skalierbare und benutzerfreundliche Plattform zu schaffen.]
+#par[Die technologischen Entscheidungen für die Umsetzung des Studentencasinos wurden auf Basis der Anforderungen und Zielsetzungen des Projekts getroffen. Für das Backend wurde das Django-Framework in Python gewählt, da es eine robuste Struktur für die Entwicklung von Webanwendungen bietet und eine einfache Integration mit Datenbanken ermöglicht. Django's integriertes Authentifizierungssystem erleichtert zudem die sichere Verwaltung von Benutzerdaten.@Django Für das Frontend fiel die Wahl auf React, da es eine komponentenbasierte Architektur bietet, die eine flexible und wiederverwendbare Gestaltung der Benutzeroberfläche ermöglicht.@React Vite wurde als Bundler eingesetzt, um schnelle Entwicklungszyklen und effizientes Build-Management zu gewährleisten.@Vite Als Datenbank wurde SQLite verwendet, da es leichtgewichtig ist und sich gut für die Anforderungen des Projekts eignet, mit der Möglichkeit, bei Bedarf auf leistungsfähigere Systeme wie MySQL oder PostgreSQL zu skalieren.@SQLite Diese technologischen Entscheidungen tragen dazu bei, eine stabile, skalierbare und benutzerfreundliche Plattform zu schaffen.]
 == Gesamtarchitektur
-//Grafik draus bauen
-Backend (API)
-- Framework: Django (Python)
-- Sprache: Python
-- API Endpoints:
-  - `GET /api/users`
-  - `POST /api/users`
-  - `GET /api/posts`
-- Authentifizierung: Django Auth System
-- Geschäftslogik: Validierung und Autorisierung durch Django-Modelle und Middleware
-- Datenbank: SQLite (mit Django ORM)
-Frontend (Client)
-- Framework: React (mit Vite als Bundler)
-- Sprache: JavaScript
-- Wichtige Komponenten:
-  - UI-Komponenten: React-Komponenten, Seiten
-  - Datenabfrage: Client-seitiges Fetching mit AJAX
-  - Navigation: React Router für client-seitige Navigation
-Datenbank
-- Datenbank: SQLite (kann für Produktion auf MySQL/PostgreSQL erweitert werden)
-- Protokoll: SQL
-- Datenbank-Komponenten: Tabellen, Indizes, Constraints, verwaltet durch Django ORM
-UI-Komponenten
-- Sprache: HTML, CSS, JavaScript
-- Framework: React
-- Server-Side Rendering: Optional, mit Next.js für SSR (nicht im Repo explizit genutzt)
-//Klassendiagramm bauen
+#par[Die Gesamtarchitektur des Studentencasinos ist in verschiedene Schichten unterteilt, die jeweils spezifische Funktionen und Verantwortlichkeiten übernehmen. Das Backend bildet die Grundlage der Anwendung und ist für die Datenverarbeitung, Nutzerverwaltung und API-Bereitstellung zuständig. Es kommuniziert mit der SQLite-Datenbank, in der alle relevanten Informationen wie Nutzerprofile, Coin-Bestände und Spielstände gespeichert werden. Das Frontend ist für die Präsentation der Benutzeroberfläche verantwortlich und interagiert über eine REST-API mit dem Backend, um Daten abzurufen und zu senden. Diese Trennung von Frontend und Backend ermöglicht eine klare Strukturierung der Anwendung und erleichtert zukünftige Erweiterungen. Die Architektur ist darauf ausgelegt, Skalierbarkeit, Sicherheit und Benutzerfreundlichkeit zu gewährleisten, indem sie bewährte Technologien und Designprinzipien nutzt.]
+#par[Die folgende @Klassendiagramm zeigt das Klassendiagramm, das die Hauptkomponenten und deren Beziehungen innerhalb der Gesamtarchitektur des Studentencasinos darstellt.]
+#figure(
+  image("image/Klassendiagramm.png", width: 120%),
+  caption: "Gesamtarchhitektur Internetauftritt Studentenkasino"
+)<Klassendiagramm>
+#v(1em)
+#par[Das Klassendiagramm illustriert die Struktur der Anwendung, indem es die wichtigsten Klassen und deren Interaktionen aufzeigt. Im Backend sind Klassen für die Nutzerverwaltung, Spielmechaniken und Datenbankinteraktionen definiert, während das Frontend Klassen für UI-Komponenten und API-Kommunikation umfasst. Diese Darstellung verdeutlicht die modulare Aufbauweise der Anwendung und die klare Trennung der Verantwortlichkeiten zwischen den verschiedenen Schichten.]
+#pagebreak()
 = Backend
-== API-Design
-== Datenbankmodell
-
+#par[Das Backend bildet die Grundlage für sämtliche Funktionalitäten einer Webanwendung. Es umfasst Datenverarbeitung, Kommunikation mit der Datenbank, Nutzerverwaltung, Sitzungsmanagement, die Bereitstellung von APIs für das Frontend u.v.m. Bestandteile eines Backends sind zum Beispiel Server, Programmiersprache, Framework, Package Manager, Datenbank.@BackendWeb In diesem Kapitel wird das Backend der Web-Anwendung dargestellt, wobei Implementierungsdetails, Datenbankmodellierung, API-Design und sicherheitsrelevante Funktionen erläutert werden.]
+== Vorraussetzung
+#par[Um mit der eigentlichen Implementierung des Backends beginnen zu können, mussten noch relevante Entscheidungen bezüglich der Auswahl von oben genannten Bestandteilen getroffen werden. Als Backend-Programmiersprache fiel die Entscheidung auf Python, da sie uns bereits vertraut ist. Das genutzte Framework ist Django, da es „so ziemlich das Framework für Python ist “.@DjangoTutorial Django vereinfacht die Arbeit im Backend, da Funktionen wie Routing, Datenbankanbindung, Authentifizierung sowie ein Admin-Interface bereits fertig zur Verfügung stehen.  Dadurch kann sich einiges an Arbeit erspart werden und direkt mit der Implementierung anwendungsspezifischer Funktionen begonnen werden. Der genutzte Package-Manager ist pip.]
+#par[Zu Beginn musste Django über pip in dem Verzeichnis „backend“ von unserem Git-Repository installiert werden. Anschließend wurden in diesem Verzeichnis das Django-Projekt „casino_backend_project“ und die Django-App „casino“ erstellt. Das Django-Projekt ist die Gesamtanwendung. Hier werden globale Einstellungen, URL-Routing, Sessions oder auch die Datenbank der Anwendung bestimmt bzw. verwaltet. Die Django App dient der Implementierung einzelner Module der Anwendung, die bestimmte Funktionen beinhalten. So könnten beispielweise für das Leaderboard, die Benutzerverwaltung oder auch die Spiele selbst jeweils eigene Apps innerhalb des Django-Projekts erstellt werden.@App In unserem Projekt wurde nur eine App für mehrere Funktionen erstellt. Bei größeren Anwendungen sollte dies Vermieden werden, um eine übersichtliche Projektstruktur zu gewährleisten.]
+== API-Design und Architektur
+#par[Das Django-Rest-Framework, ebenfalls über pip im Verzeichnis backend installiert, dient als Ergänzung zu Django um eine REST-API bereitzustellen. Diese API bildet die Schnittstelle zwischen dem Frontend und dem Backend und ermöglicht eine klare Trennung zwischen Präsentationsebene und der Applikationslogik. Durch die API kann eine Anwendung auf eine Ressource (z.B. Nutzer, Session, Spielstand) einer anderen Anwendung zugreifen, indem ein HTTP-Request wie zum Beispiel POST oder GET an einen End Point der API (eine URL) gesendet wird. In der Datei urls.py der Django-App werden unsere End Points definiert. In der Datei urls.py im Django-Projekt werden die End Points in das Projekt eingebunden und es wird das Präfix /api/casino/ an sie vorangesetzt. Daraus ergibt sich nun ihr vollständiger Name. Diesen End Points liegen Funktionen zugrunde, die über diese vollständige URL aufrufbar sind. Die REST-API unseres Backendes hat die folgenden End Points mit den zugrundeliegenden Funktionen:]
+-	/api/casino/session/: Session Prüfung und Informationen über den eingeloggten Nutzer bereitstellen
+-	/api/casino/register/: Registrierung neuer Nutzer inkl. Session-Erzeugung
+-	/api/casino/login/: Nutzer-Login inkl. Session-Erzeugung
+-	/api/casino/logout/: Beenden der Sitzung
+-	/api/casino/csrf/: Erstellt CSRF-Token bei Bedarf
+-	/api/casino/“Spielmechanik“/: Endpunkte zur Kommunikation mit den jeweiligen Spielmechaniken
+#par[Der auf den Request folgende Response wird dank des Django-Rest-Frameworks im JSON-Format ausgegeben und kann im Frontend verarbeitet werden.]
+== Datenbank und User-Modell
+#par[Die genutzte Datenbank ist SQLite, eine relationale Datenbank die standardmäßig mit Django mitinstalliert wird. SQLite erfüllt zentrale Anforderungen, die innerhalb der Entwicklung an die Datenbank aufkamen: Speicherung der Nutzer, Verwaltung des Punktestands, Speicherung von Sessions sowie die persistente Ablage relevanter Daten. SQLite ist eine kleine, aber für das Projekt vollkommen ausreichende Datenbank. Sie ist performant, sehr stabil und kann problemlos auch große Datenmengen verarbeiten.  Um zu skalieren und eine höhere Anzahl paralleler Nutzer problemlos tragen zu können, sollte aber auf eine größere Datenbank wie PostgreSQL oder MySQL umgestiegen werden.]
+#par[Im Verlaufe des Projekts ergab sich, dass in @ERM aus der Realität abstrahierte ER-Modell:]
+#figure(
+  image("image/ERM.png"),
+  caption: "ER-Modell der Datenbank"
+)<ERM>
+#par[Hierfür stellt Django ein vollständiges Authentifizierungsmodell mit standardisiertem User-Modell bereit, dass Informationen wie Benutzername, Passwort (gehasht), E-Mail oder auch berechtigungsbezogene Daten speichert. Dieses Standardmodell umfasst jedoch keine anwendungsspezifischen Attribute wie den Punktestand eines Nutzers. Um dieses Attribut zu definieren, wurde ein eigenes User-Modell auf Basis von AbstractBaseUser und PermissionsMixin implementiert. Dadurch konnte das Feld points ergänzt werden, während zentrale Django-Funktionen wie Authentifizierung, Passwort-Hashing und Session-Integration vollständig erhalten bleiben.]
+#par[Das für den User benötigte Datenmodell wurde mithilfe des Object-Relational Mappings von Django in der Datei models.py im Verzeichnis casino definiert. Das Object-Relational Mapping, eine „Programmiertechnik, die den Zugriff auf relationale Datenbanken durch die Abbildung von Datenbanktabellen auf Objekte einer Programmiersprache vereinfacht“,@ORM erlaubt es, Datenbanktabellen in Form von Python-Klassen zu definieren und anschließend automatisch in die zugrunde liegende relationale Datenbank zu übertragen.@ORM Durch das Session-System von Django wurde die Sitzungstabelle „django_session“ von Django automatisch erzeugt. Sie musste nicht in models.py definiert werden.]
+== Sessions, Authentifizierung und Sicherheit
+#par[Für die Authentifizierung und Sitzungsverwaltung wird das in Django integrierte Session- und Cookie-System genutzt. Nach einer erfolgreichen Registrierung oder Anmeldung erzeugt Django automatisch ein Session-Cookie, das eine eindeutige Session-ID enthält. Dieses Cookie wird im Browser gespeichert und bei jeder API-Anfrage automatisch an das Backend übermittelt.@Cookies  Da alle eigentlichen Session-Daten serverseitig in der Datenbank liegen, kann Django anhand der Session-ID zuverlässig den zugehörigen Nutzer identifizieren und den Anmeldestatus durchgängig aufrechterhalten.  Bei einer gültigen Übereinstimmung lädt Django die spezifischen Session-Daten und authentifiziert den Nutzer.]
+#par[Da das Frontend ausschließlich über Fetch-API kommuniziert, werden die Session-Cookies erst durch die Konfiguration von \<credentials: "include">\ in der Datei „settings.py“ gezielt an jede Anfrage angehängt. Für potenzielles hosten über getrennte Frontend- und Backend-Server und damit einhergehend unterschiedlichen Domains, wurden die Cookie-Einstellungen (ebenfalls in settings.py) entsprechend angepasst: \<SESSION_COOKIE_SAMESITE = 'None'\> erlaubt die domainübergreifende Übertragung, während \<SESSION_COOKIE_SECURE = True\> sicherstellt, dass Cookies ausschließlich über HTTPS gesendet werden.]
+#par[Die Sicherheit der Anwendung wird zusätzlich durch eine strenge CORS-Konfiguration in settings.py unterstützt. Diese CORS-Konfiguration stellt sicher, dass nur explizit freigegebene Frontend-Domains auf die API zugreifen bzw. die Responses des Servers lesen dürfen. Ohne entsprechende CORS-Freigaben würde der Browser die Responses des Backends aufgrund der Same-Origin-Policy (SOP) standardmäßig blockieren. Da das Projekt serverseitig verwaltete Session-Cookies für die Authentifizierung nutzt, ist zusätzlich der Einsatz eines CSRF-Tokens erforderlich. Der CSRF-Mechanismus verhindert, dass externe Webseiten im Kontext einer bestehenden Session ungewollte Aktionen ausführen können. Das Backend akzeptiert POST-Anfragen nur, wenn das vom Frontend im Header des Requests gesendete CSRF-Token exakt mit dem serverseitig gespeicherten Token übereinstimmt, das auch als Cookie an den Browser ausgegeben wurde.]
+== Spiellogiken
+#par[Die Spiellogiken der einzelnen Spiele wurden Im Verzeichnis „game_logic“ in der Django-App realisiert, während bestimmte Interaktionen (z.B. hit oder stand Blackjack) weiterhin im Frontend stattfinden. Das Backend ist dabei für die korrekte Verarbeitung aller für die Spiele relevanten Abläufe verantwortlich. Durch die zentrale Umsetzung der Spiellogik im Backend bleibt die Anwendung konsistent und geschützter vor clientseitigen Manipulationen, da die Berechnungen nicht im Browser des Nutzers stattfinden, sondern vom Server durchgeführt werden.]
+#pagebreak()
 = Frontend
 == Technologie-Stack
 == Komponentenstruktur
-
+#pagebreak()
 = Hosting
 == Server-/Hosting-Modell
 == Deployment-Prozess
-= Projektergebnis/Reflexion
-
+#pagebreak()
+= Fazit und Ausblick
+#par[Abschließend lässt sich sagen, dass die Entwicklung der Webanwendung für das Studentencasino einen erfolgreichen Verlauf genommen hat, insbesondere in Bezug auf die Skalierbarkeit und Benutzerfreundlichkeit. Das Projekt hat es ermöglicht, die Herausforderungen moderner Webentwicklung zu meistern, insbesondere in der Implementierung von Echtzeit-Interaktionen und der sicheren Verwaltung von Benutzerdaten. Ein wesentlicher Aspekt war dabei die Einführung der Spielwährung „Coin“, die als zentrale Ressource die Interaktivität und den Wettbewerb zwischen den Nutzern fördert. Auch die modulare Struktur des Systems stellt sicher, dass zukünftige Erweiterungen, wie neue Spiele und Funktionen, problemlos integriert werden können.]
+#par[Die Sicherheit des Systems, insbesondere in Bezug auf die Speicherung und Verarbeitung der Spielwährung, wurde durch fundierte technische Entscheidungen gewährleistet. Ein weiteres Highlight des Projekts war die benutzerfreundliche Gestaltung der Oberfläche, die sicherstellt, dass auch nicht-technische Nutzer ohne Schwierigkeiten die Anwendung verwenden können.]
+#par[Im Hinblick auf das Marketing wurde ein Instagram-Account erstellt,#footnote("der Instagramm Account heißt: studygamb1ing (https://www.instagram.com/studygamb1ing?igsh=MWMwYWE1Z3Nnd2VjMg==)") um das Projekt bekannt zu machen und die Zielgruppe anzusprechen. Dennoch gibt es noch offene Aufgaben im GitHub-Repository, die weiterhin bearbeitet werden können, um die Plattform weiter zu optimieren und zusätzliche Funktionen zu integrieren. Der agile Entwicklungsansatz hat dabei nicht nur eine schnelle Umsetzung ermöglicht, sondern auch die Flexibilität bewiesen, auf Herausforderungen effizient zu reagieren.]
+#par[Zusammenfassend lässt sich feststellen, dass das Projekt eine solide Grundlage für die Umsetzung eines skalierbaren und sicheren Webportals für spielerische Elemente und Wettbewerbsmechanismen bietet. Für die Zukunft sind regelmäßige Wartungs- und Erweiterungsarbeiten erforderlich, um das System aktuell zu halten und den wachsenden Anforderungen gerecht zu werden.]
+#pagebreak()
+#set heading(numbering: none)
 = Anhang
 = Literaturverzeichnis
 #bibliography(
