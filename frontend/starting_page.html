@@ -3,564 +3,193 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Student Gambling Site</title>
-  <style>
-    @font-face {
-      font-family: 'Dalek Pinpoint';
-      src: url("fonts/DalekPinpointBold.woff2") format('woff2'),
-           url("fonts/DalekPinpointBold.woff") format('woff');
-      font-weight: bold;
-      font-style: normal;
-    }
-    body {
-      margin: 0;
-      padding: 0;
-      background-color: #1e1e1e;
-      font-family: 'Dalek Pinpoint', sans-serif;
-      color: #fff;
-      text-align: center;
-    }
-    header {
-      padding: 40px 0;
-      position: relative;
-    }
-    h1 {
-      margin: 0;
-      font-size: 5rem;
-      line-height: 1.2;
-    }
-    #username-display {
-      position: absolute;
-      right: 30px;
-      top: 25px;
-      font-size: 1.5rem;
-      color: #1abc9c;
-    }
-
-/* 🔹 Username klickbar machen */
-#username-display {
-  cursor: pointer;          /* zeigt Handcursor statt Textcursor */
-  user-select: none;        /* verhindert Textmarkierung */
-  transition: color 0.2s, transform 0.2s;
-}
-
-#username-display:hover {
-  color: #16e0b5;           /* etwas helleres Grün beim Hover */
-  transform: scale(1.05);   /* leicht vergrößern für Feedback */
-}
-
-
-    #logout-btn {
-      position: absolute;
-      right: 30px;
-      top: 60px;
-      font-size: 1rem;
-      background: #444;
-      color: white;
-      border: none;
-      padding: 6px 14px;
-      border-radius: 8px;
-      cursor: pointer;
-      display: none;
-    }
-    #logout-btn:hover {
-      background-color: #1abc9c;
-    }
-    p {
-      font-size: 2rem;
-      margin-top: 40px;
-    }
-    .image-container {
-      display: flex;
-      gap: 100px;
-      justify-content: center;
-      flex-wrap: wrap;
-      padding: 80px 0 40px 0;
-    }
-    .image-box {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      opacity: 0.5;
-      pointer-events: none;
-      transition: opacity 0.3s;
-    }
-    .image-box.enabled {
-      opacity: 1;
-      pointer-events: all;
-    }
-    .image-box a img, .image-box img {
-      width: 180px;
-      height: 180px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 3px solid rgb(28, 87, 3);
-      transition: transform 0.3s, box-shadow 0.3s;
-    }
-    .image-box a img:hover {
-      transform: scale(1.1);
-      cursor: pointer;
-      box-shadow: 0 0 20px #1abc9c;
-    }
-    .image-box span {
-      margin-top: 15px;
-      color: white;
-      font-size: 1.2rem;
-    }
-
-    /* Registrierung */
-    .register-container {
-      margin-top: 60px;
-      background-color: #222;
-      display: inline-block;
-      padding: 20px 40px;
-      border-radius: 15px;
-      box-shadow: 0 0 10px #1abc9c;
-    }
-    .register-container input {
-      display: block;
-      width: 100%;
-      margin: 10px 0;
-      padding: 10px;
-      font-size: 1rem;
-      border: none;
-      border-radius: 8px;
-    }
-    .register-container button {
-      background-color: #1abc9c;
-      color: white;
-      font-size: 1.2rem;
-      padding: 10px 20px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-    .register-container button:hover {
-      background-color: #159d82;
-    }
-
-/* 🔹 Popup-Styling */
-.popup {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.6);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-}
-
-.popup.hidden {
-  display: none;
-}
-
-.popup-content {
-  background: #222;
-  border: 2px solid #1abc9c;
-  border-radius: 12px;
-  padding: 25px 40px;
-  color: #fff;
-  box-shadow: 0 0 20px #1abc9c;
-  text-align: left;
-  min-width: 300px;
-}
-
-.popup-content h3 {
-  margin-top: 0;
-  color: #1abc9c;
-}
-
-#close-popup {
-  margin-top: 15px;
-  background-color: #1abc9c;
-  border: none;
-  color: #fff;
-  border-radius: 8px;
-  padding: 8px 16px;
-  cursor: pointer;
-}
-
-#close-popup:hover {
-  background-color: #159d82;
-}
-
-#leaderboard-btn {
-  position: absolute;
-  right: 135px;
-  top: 22px;
-  font-size: 1.8rem;
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: #f0c330;
-  transition: transform 0.2s, color 0.2s;
-}
-
-#leaderboard-btn:hover {
-  transform: scale(1.1);
-  color: #ffd700;
-}
-
-#leaderboard-popup input {
-  width: 100%;
-  padding: 8px;
-  border-radius: 6px;
-  border: none;
-  margin-top: 5px;
-  margin-bottom: 10px;
-  font-size: 1rem;
-}
-
-
-  </style>
+  <title>Student Gambling Site - Welcome</title>
+  <link rel="stylesheet" href="starting_page.css" />
 </head>
 <body>
+  <!-- Animierter Hintergrund: visuelle, sich langsam bewegende Hintergrund-Animation -->
+  <div class="background-animation"></div>
 
+  <!-- Kopfbereich: Seiten-Titel und Benutzerinformationen (Punkte, Logout) -->
   <header>
-    <h1>Student Gambling Site!</h1>
-    <div id="username-display"></div>
-    <div id="points-display" style="position:absolute; right:30px; top:90px; font-size:1.2rem; color:#f0c330;"></div> <!-- Punkte-Anzeige -->
-    <button id="logout-btn">Logout</button>
-    <button id="leaderboard-btn" title="Top Spieler">🏆</button>
-
+    <div class="header-content">
+      <h1 class="site-title">Student Gambling Site</h1>
+      <div class="user-info">
+        <div id="username-display"></div>
+        <div id="points-display"></div>
+        <button id="logout-btn" class="btn-logout">Logout</button>
+      </div>
+    </div>
   </header>
 
-<!-- 🔹 Popup-Fenster für User-Info -->
-<div id="user-info-popup" class="popup hidden">
-  <div class="popup-content">
-    <h3>👤 Benutzerinfo</h3>
-    <p><strong>Username:</strong> <span id="popup-username"></span></p>
-    <p><strong>E-Mail:</strong> <span id="popup-email"></span></p>
-    <p><strong>ID:</strong> <span id="popup-id"></span></p>
-    <button id="close-popup">Schließen</button>
-  </div>
-</div>
+  <!-- Hauptinhalt: Willkommens- und Spiele-Bereich -->
+  <main class="main-content">
+    <!-- Begrüßungsbereich: sichtbar für angemeldete Benutzer -->
+    <section id="welcome-section" class="welcome-section">
+      <h2>Choose Your Game</h2>
+      <p class="subtitle">Test your luck and win big!</p>
+    </section>
 
-<!-- 🔹 Leaderboard-Popup -->
-<div id="leaderboard-popup" class="popup hidden">
-  <div class="popup-content">
-    <h3>🏆 Top 50 Spieler</h3>
-    <input type="text" id="search-player" placeholder="Spieler suchen..." />
-    <table id="leaderboard-table" style="width:100%; margin-top:15px; color:white;">
-      <thead>
-        <tr><th>#</th><th>Username</th><th>Punkte</th></tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-    <button id="close-leaderboard">Schließen</button>
-  </div>
-</div>
+    <!-- Spiele-Raster: enthält einzelne Spiel-Karten (linkbar oder disabled) -->
+    <div class="games-container">
+      <!-- Spielkarte: Roulette (aktiv) -->
+      <div class="game-card" data-game="roulette">
+        <a href="../games/roulette.html" class="game-link">
+          <div class="game-image">
+            <img src="../images_starting_page/roulette.png" alt="Roulette" />
+            <div class="game-overlay">
+              <span class="play-icon">▶</span>
+            </div>
+          </div>
+          <h3 class="game-title">Roulette</h3>
+          <p class="game-description">Spin the wheel and win</p>
+        </a>
+      </div>
 
-  <p>Choose a game to play...</p>
+      <!-- Spielkarte: Blackjack (aktiv) -->
+      <div class="game-card" data-game="blackjack">
+        <a href="../games/blackjack.html" class="game-link">
+          <div class="game-image">
+            <img src="../images_starting_page/blackjack.png" alt="Blackjack" />
+            <div class="game-overlay">
+              <span class="play-icon">▶</span>
+            </div>
+          </div>
+          <h3 class="game-title">Blackjack</h3>
+          <p class="game-description">Beat the dealer at 21</p>
+        </a>
+      </div>
 
-  <div class="image-container">
-    <div class="image-box">
-      <a href="games/roulette.html">
-        <img src="images_starting_page/roulette.png" alt="Roulette" />
-      </a>
-      <span>Roulette</span>
+      <!-- Spielkarte: Poker (disabled / Coming Soon) -->
+      <div class="game-card disabled" data-game="poker">
+        <div class="game-link">
+          <div class="game-image">
+            <img src="../images_starting_page/poker.png" alt="Poker" />
+            <div class="game-overlay">
+              <span class="coming-soon">Coming Soon</span>
+            </div>
+          </div>
+          <h3 class="game-title">Poker</h3>
+          <p class="game-description">Test your poker face</p>
+        </div>
+      </div>
+
+      <!-- Spielkarte: Baccarat (disabled / Coming Soon) -->
+      <div class="game-card disabled" data-game="baccarat">
+        <div class="game-link">
+          <div class="game-image">
+            <img src="../images_starting_page/baccarat.png" alt="Baccarat" />
+            <div class="game-overlay">
+              <span class="coming-soon">Coming Soon</span>
+            </div>
+          </div>
+          <h3 class="game-title">Baccarat</h3>
+          <p class="game-description">The classic casino game</p>
+        </div>
+      </div>
     </div>
-    <div class="image-box">
-      <a href="games/blackjack.html">
-        <img src="images_starting_page/blackjack.png" alt="Blackjack" />
-      </a>
-      <span>Blackjack</span>
-    </div>
-    <div class="image-box">
-      <img src="images_starting_page/poker.png" alt="Poker" />
-      <span>Poker</span>
-    </div>
-    <div class="image-box">
-      <a href="games/baccarat.html">
-      <img src="images_starting_page/baccarat.png" alt="Baccara" />
-      </a>
-      <span>Baccarat</span>
-    </div>
-  </div>
 
-  <!-- Registrierung -->
-  <div id="register-section" class="register-container">
-    <h2>Registriere dich, um zu spielen!</h2>
-    <form id="registerForm">
-      <input type="text" name="username" placeholder="Benutzername" required />
-      <input type="email" name="email" placeholder="E-Mail" required />
-      <input type="password" name="password" placeholder="Passwort" required />
-      <button type="submit">Registrieren</button>
-    </form>
-  </div>
+    <!-- Authentifizierungsbereich: Login und Registrierung -->
+    <section id="auth-section" class="auth-section">
+      <div class="auth-container">
+        <div class="auth-tabs">
+          <button class="tab-btn active" data-tab="login">Login</button>
+          <button class="tab-btn" data-tab="register">Register</button>
+        </div>
 
-  <!-- Anmeldung -->
-<div id="login-section" class="register-container" style="display:none;">
-  <h2>Bereits registriert? Melde dich an!</h2>
-  <form id="loginForm">
-    <input type="text" name="username" placeholder="Benutzername" required />
-    <input type="password" name="password" placeholder="Passwort" required />
-    <button type="submit">Login</button>
-  </form>
-</div>
+        <!-- Login-Formular: Eingabe von Benutzername und Passwort -->
+        <div id="login-section" class="auth-form active">
+          <h2>Welcome Back!</h2>
+          <p class="form-subtitle">Login to start playing</p>
+          <form id="loginForm">
+            <div class="form-group">
+              <label for="login-username">Username</label>
+              <input
+                type="text"
+                id="login-username"
+                name="username"
+                placeholder="Enter your username"
+                required
+                autocomplete="username"
+              />
+            </div>
+            <div class="form-group">
+              <label for="login-password">Password</label>
+              <input
+                type="password"
+                id="login-password"
+                name="password"
+                placeholder="Enter your password"
+                required
+                autocomplete="current-password"
+              />
+            </div>
+            <button type="submit" class="btn-submit">Login</button>
+            <div class="form-footer">
+              <p>Don't have an account? <a href="#" class="switch-form" data-target="register">Register here</a></p>
+            </div>
+          </form>
+        </div>
 
-<script>
-  // 🔹 CSRF-Cookie vom Server anfordern (beim Start)
-fetch("https://michi22.pythonanywhere.com/api/casino/session/", { credentials: "include" });
+        <!-- Registrierungs-Formular: neues Konto erstellen (1000 Startpunkte) -->
+        <div id="register-section" class="auth-form">
+          <h2>Join the Fun!</h2>
+          <p class="form-subtitle">Create your account and get 1000 free points</p>
+          <form id="registerForm">
+            <div class="form-group">
+              <label for="register-username">Username</label>
+              <input
+                type="text"
+                id="register-username"
+                name="username"
+                placeholder="Choose a username"
+                required
+                minlength="3"
+                autocomplete="username"
+              />
+            </div>
+            <div class="form-group">
+              <label for="register-email">Email</label>
+              <input
+                type="email"
+                id="register-email"
+                name="email"
+                placeholder="Enter your email"
+                required
+                autocomplete="email"
+              />
+            </div>
+            <div class="form-group">
+              <label for="register-password">Password</label>
+              <input
+                type="password"
+                id="register-password"
+                name="password"
+                placeholder="Create a password"
+                required
+                minlength="6"
+                autocomplete="new-password"
+              />
+            </div>
+            <button type="submit" class="btn-submit">Create Account</button>
+            <div class="form-footer">
+              <p>Already have an account? <a href="#" class="switch-form" data-target="login">Login here</a></p>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+  </main>
 
-  // 🔹 CSRF-Token aus Cookie holen
-  function getCookie(name) {
-    const value = `; ${document.cookie}`;
-    const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) return parts.pop().split(';').shift();
-  }
+  <!-- Toast-Benachrichtigung: kleine, temporäre Rückmeldungen (Erfolg/Fehler) -->
+  <div id="toast" class="toast"></div>
 
-  const registerSection = document.getElementById("register-section");
-  const loginSection = document.getElementById("login-section");
-  const usernameDisplay = document.getElementById("username-display");
-  const logoutBtn = document.getElementById("logout-btn");
-  const imageBoxes = document.querySelectorAll(".image-box");
+  <!-- Footer: rechtliche Hinweise / Copyright -->
+  <footer class="footer">
+    <p>&copy; 2024 Student Gambling Site - Play Responsibly</p>
+  </footer>
 
-  function enableGames() {
-    imageBoxes.forEach(box => box.classList.add("enabled"));
-  }
-
-  function disableGames() {
-    imageBoxes.forEach(box => box.classList.remove("enabled"));
-  }
-
-const pointsDisplay = document.getElementById("points-display");
-
-  // 🔹 Session prüfen beim Laden
-  async function checkSession() {
-    try {
-      const res = await fetch("https://michi22.pythonanywhere.com/api/casino/session/", {
-        credentials: "include"
-      });
-      const data = await res.json();
-
-      if (data.authenticated) {
-        usernameDisplay.textContent = "👤 " + data.user.username;
-        pointsDisplay.textContent = "💰 " + data.user.points + " Punkte";
-        registerSection.style.display = "none";
-        loginSection.style.display = "none";
-        logoutBtn.style.display = "inline-block";
-        enableGames();
-      } else {
-        usernameDisplay.textContent = "";
-        pointsDisplay.textContent = "";
-        registerSection.style.display = "inline-block";
-        loginSection.style.display = "inline-block";
-        logoutBtn.style.display = "none";
-        disableGames();
-      }
-    } catch (err) {
-      console.error("Fehler beim Prüfen der Session:", err);
-    }
-  }
-
-  checkSession();
-
-  // 🔹 Registrierung
-  document.getElementById("registerForm").addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const formData = Object.fromEntries(new FormData(e.target));
-
-    try {
-      const response = await fetch("https://michi22.pythonanywhere.com/api/casino/register/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-CSRFToken": getCookie("csrftoken")
-        },
-        credentials: "include",
-        body: JSON.stringify(formData)
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        alert("Willkommen, " + data.user.username + "!");
-        checkSession();
-      } else {
-        alert("Fehler: " + (data.error || "Unbekannter Fehler"));
-      }
-    } catch (err) {
-      alert("Serverfehler: " + err.message);
-    }
-  });
-
-  // 🔹 Login
-  document.getElementById("loginForm").addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const formData = Object.fromEntries(new FormData(e.target));
-
-    try {
-      const response = await fetch("https://michi22.pythonanywhere.com/api/casino/login/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-CSRFToken": getCookie("csrftoken")
-        },
-        credentials: "include",
-        body: JSON.stringify(formData)
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        alert("Willkommen zurück, " + data.user.username + "!");
-        checkSession();
-      } else {
-        alert("Fehler: " + (data.error || "Ungültige Anmeldedaten"));
-      }
-    } catch (err) {
-      alert("Serverfehler: " + err.message);
-    }
-  });
-
-  // 🔹 Logout (mit CSRF-Token)
-  logoutBtn.addEventListener("click", async () => {
-    const csrftoken = getCookie('csrftoken');
-    try {
-      const res = await fetch("https://michi22.pythonanywhere.com/api/casino/logout/", {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          "X-CSRFToken": csrftoken
-        }
-      });
-      if (res.ok) {
-        alert("Logout erfolgreich.");
-        checkSession();
-      } else {
-        console.error("Logout fehlgeschlagen.", res.status);
-      }
-    } catch (err) {
-      console.error("Fehler beim Logout:", err);
-    }
-  });
-
-// Punkte-Updates per Polling (alle 3 Sekunden)
-function updatePointsPeriodically() {
-  setInterval(async () => {
-    try {
-      const res = await fetch("https://michi22.pythonanywhere.com/api/casino/session/", {
-        credentials: "include"
-      });
-      const data = await res.json();
-      if (data.authenticated) {
-        const pointsDisplay = document.getElementById("points-display");
-        pointsDisplay.textContent = "💰 " + data.user.points + " Punkte";
-      }
-    } catch (err) {
-      console.error("Fehler beim Aktualisieren der Punkte:", err);
-    }
-  }, 3000); // Alle 3 Sekunden
-}
-
-// Starte Polling nach erfolgreichem Login
-updatePointsPeriodically();
-
-// 🔹 User-Info Popup anzeigen beim Klick auf den Username oder Kopf
-const userInfoPopup = document.getElementById("user-info-popup");
-const popupUsername = document.getElementById("popup-username");
-const popupEmail = document.getElementById("popup-email");
-const popupId = document.getElementById("popup-id");
-const closePopup = document.getElementById("close-popup");
-
-usernameDisplay.addEventListener("click", async () => {
-  try {
-    const res = await fetch("https://michi22.pythonanywhere.com/api/casino/session/", {
-      credentials: "include"
-    });
-    const data = await res.json();
-
-    if (data.authenticated) {
-      popupUsername.textContent = data.user.username;
-      popupEmail.textContent = data.user.email;
-      popupId.textContent = data.user.id;
-      userInfoPopup.classList.remove("hidden");
-    } else {
-      alert("Du bist nicht eingeloggt!");
-    }
-  } catch (err) {
-    console.error("Fehler beim Laden der Userdaten:", err);
-  }
-});
-
-closePopup.addEventListener("click", () => {
-  userInfoPopup.classList.add("hidden");
-});
-
-// Optional: Klick außerhalb schließt Popup
-userInfoPopup.addEventListener("click", (e) => {
-  if (e.target === userInfoPopup) {
-    userInfoPopup.classList.add("hidden");
-  }
-});
-
-// 🔹 Leaderboard-Popup-Logik
-const leaderboardBtn = document.getElementById("leaderboard-btn");
-const leaderboardPopup = document.getElementById("leaderboard-popup");
-const closeLeaderboard = document.getElementById("close-leaderboard");
-const leaderboardTable = document.querySelector("#leaderboard-table tbody");
-const searchPlayerInput = document.getElementById("search-player");
-
-async function loadLeaderboard(query = "") {
-  let url = "https://michi22.pythonanywhere.com/api/casino/leaderboard/";
-  if (query) {
-    url += `?search=${encodeURIComponent(query)}`;
-  }
-  const res = await fetch(url);
-  const data = await res.json();
-
-  leaderboardTable.innerHTML = "";
-  data.forEach(player => {
-    const row = document.createElement("tr");
-    row.innerHTML = `
-      <td>${player.rank ? player.rank : "-"}</td>
-      <td>${player.username}</td>
-      <td>${player.points}</td>
-    `;
-    leaderboardTable.appendChild(row);
-  });
-}
-
-leaderboardBtn.addEventListener("click", async () => {
-  await loadLeaderboard();
-  leaderboardPopup.classList.remove("hidden");
-});
-
-closeLeaderboard.addEventListener("click", () => {
-  leaderboardPopup.classList.add("hidden");
-});
-
-leaderboardPopup.addEventListener("click", (e) => {
-  if (e.target === leaderboardPopup) {
-    leaderboardPopup.classList.add("hidden");
-  }
-});
-
-searchPlayerInput.addEventListener("input", async (e) => {
-  const query = e.target.value.trim();
-  await loadLeaderboard(query);
-});
-
-
-</script>
+  <!-- Seite-spezifisches Skript: steuert Authentifizierung, UI-Updates und Interaktionen -->
+  <script src="starting_page.js"></script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
