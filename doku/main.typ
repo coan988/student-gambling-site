@@ -182,7 +182,7 @@
 #par[Die folgende @Klassendiagramm zeigt das Klassendiagramm, das die Hauptkomponenten und deren Beziehungen innerhalb der Gesamtarchitektur des Studentencasinos darstellt.]
 #figure(
   image("image/Klassendiagramm.png", width: 120%),
-  caption: "Gesamtarchhitektur Internetauftritt Studentenkasino"
+  caption: "Gesamtarchitektur Internetauftritt Studentenkasino"
 )<Klassendiagramm>
 #v(1em)
 #par[Das Klassendiagramm illustriert die Struktur der Anwendung, indem es die wichtigsten Klassen und deren Interaktionen aufzeigt. Im Backend sind Klassen für die Nutzerverwaltung, Spielmechaniken und Datenbankinteraktionen definiert, während das Frontend Klassen für UI-Komponenten und API-Kommunikation umfasst. Diese Darstellung verdeutlicht die modulare Aufbauweise der Anwendung und die klare Trennung der Verantwortlichkeiten zwischen den verschiedenen Schichten.]
@@ -222,8 +222,54 @@
 == Komponentenstruktur
 #pagebreak()
 = Hosting
-== Server-/Hosting-Modell
-== Deployment-Prozess
+#par[Evaluierung der Hosting-Strategie und Umsetzung der Systemarchitektur
+Der Übergang von einer lokalen Entwicklungsumgebung hin zu einem produktiven System ist ein entscheidender Schritt in der Softwareentwicklung. Dieses Kapitel beleuchtet den Deployment-Prozess der Casino-Applikation. Dabei stehen nicht nur die technischen Schritte im Vordergrund, sondern auch die Auswahl der passenden Infrastruktur, der Umgang mit Sicherheitsanforderungen sowie die Anpassung der Software an die Gegebenheiten der Hosting-Plattform.]
+== Anforderungsanalyse und Ziel der Veröffentlichung
+#par[Bereits zu Beginn des Projekts wird festgelegt, dass die Anwendung nicht auf die lokale Umgebung („localhost“) beschränkt bleiben soll. Das Ziel ist es, die Webanwendung öffentlich über das Internet zugänglich zu machen. Dies erfüllt zwei wesentliche Funktionen: Zum einen lässt sich so eine realistische Nutzungssituation simulieren, zum anderen kann überprüft werden, wie sich das System verhält, wenn mehrere Nutzer von extern darauf zugreifen. Erst dieser Schritt belegt, dass das entwickelte Django-Backend und das Frontend stabil zusammenarbeiten.]
+=== Analyse der Option Self-Hosting
+#par[Zunächst wird geprüft, ob ein eigener Server betrieben werden kann, beispielsweise durch die Nutzung eines alten PCs als Linux-Server. Dieser Ansatz wäre aus Lernperspektive interessant, um Erfahrungen mit Server-Hardware und Netzwerken zu sammeln. Nach genauerer Betrachtung wird diese Option jedoch aus folgenden Gründen verworfen:]
+- Sicherheit: Ein öffentlicher Server im Heimnetzwerk erfordert das Öffnen von Ports am Router. Ohne professionelle Sicherheitsvorkehrungen (wie eine separate DMZ) macht dies das private Netzwerk anfällig für Angriffe von außen.
+- Erreichbarkeit: Private Internetanschlüsse haben oft wechselnde IP-Adressen. Um die Seite dauerhaft erreichbar zu machen, wäre ein Dynamic-DNS-Dienst nötig, was den Aufwand erhöht.
+- Ausfallsicherheit: Herkömmliche PC-Hardware bietet keine Ausfallsicherheit. Ein Stromausfall oder Hardwaredefekt würde sofort dazu führen, dass die Seite nicht mehr erreichbar ist. Zudem würde die Wartung des Betriebssystems wertvolle Zeit kosten, die für die Programmierung fehlt.
+=== Entscheidung für PythonAnywhere
+#par[Aufgrund der Nachteile des Eigenbetriebs fällt die Wahl auf einen professionellen „Platform-as-a-Service“ (PaaS)-Anbieter. Nach einem Vergleich verschiedener Optionen entscheidet sich das Projektteam für PythonAnywhere. Diese Wahl bietet entscheidende Vorteile für das vorliegende Projekt:]
+- Spezialisierung: Im Gegensatz zu leeren Servern (VPS), die komplett selbst eingerichtet werden müssen, bietet PythonAnywhere eine Umgebung, die bereits perfekt auf Python und Django abgestimmt ist. Das erleichtert die Einrichtung erheblich.
+- Fokus auf den Code: Da sich der Anbieter um Hardware und Betriebssystem kümmert, kann der Fokus voll auf der Entwicklung der Applikation liegen.
+- Kosten: Für ein Schulprojekt ist der kostenlose „Beginner“-Plan ideal. Er hat zwar Einschränkungen (z. B. keine eigene Domain), reicht aber völlig aus, um die Funktionsfähigkeit der App zu demonstrieren.
+== Technische Umsetzung und Konfiguration
+#par[Nach der Wahl des Anbieters folgt die technische Einrichtung. Dies umfasst den Upload des Codes, die Installation von Bibliotheken und die Konfiguration des Servers.]
+=== Versionskontrolle mit Git
+#par[Um den Code sicher auf den Server zu übertragen, wird Git verwendet. Da GitHub keine Passwörter mehr für die Befehlszeile unterstützt, wird ein „Personal Access Token“ eingerichtet. Dies erlaubt eine sichere Verbindung zwischen dem Server und dem Code-Repository. Der Ablauf ist dabei klar definiert: Änderungen werden lokal entwickelt und in den Hauptzweig („main branch“) geladen. Auf dem Server wird der aktuelle Stand dann heruntergezogen. Dabei muss besonders auf die Konfigurationsdatei (settings.py) geachtet werden, da sich die Einstellungen für die lokale Umgebung und den Server unterscheiden. Sensible Daten wie Sicherheitsschlüssel werden dabei bewusst nicht über Git geteilt, um die Sicherheit zu gewährleisten.]
+=== Einrichtung der Umgebung
+Damit die Software stabil läuft, wird eine virtuelle Umgebung („virtual environment“) eingerichtet. Dies isoliert die installierten Pakete vom Rest des Systems und stellt sicher, dass genau die Versionen verwendet werden, die für das Projekt nötig sind. Die Installation der Abhängigkeiten erfolgt über die Datei requirements.txt. Ein anfänglicher Fehler mit dem Paket channels lässt sich so beheben. Wichtig ist zudem, dass im Dashboard von PythonAnywhere der Pfad zu dieser virtuellen Umgebung hinterlegt wird, damit der Server weiß, welche Python-Version er nutzen soll. Abschließend werden mit dem Befehl python manage.py collectstatic alle statischen Dateien (Bilder, CSS, JavaScript) an einem zentralen Ort gesammelt, damit sie vom Server effizient ausgeliefert werden können.
+== Herausforderungen durch CORS und CSRF
+#par[Eine der größten Hürden beim Deployment sind die Sicherheitsmechanismen moderner Browser, insbesondere „Cross-Origin Resource Sharing“ (CORS). Anfangs treten Probleme beim Login auf, da Frontend und Backend technisch gesehen auf unterschiedlichen Adressen laufen. Der Browser blockiert daher die Kommunikation. Um dies zu lösen, wird das Paket django-cors-headers installiert. Es wird so konfiguriert, dass Anfragen von vertrauenswürdigen Quellen (sowohl lokal als auch von der Produktions-Domain) erlaubt sind. Zusätzlich müssen die Einstellungen für „Cross-Site Request Forgery“ (CSRF) angepasst werden, damit das Backend auch schreibende Zugriffe (wie das Speichern von Daten) akzeptiert. Auch die Einstellungen für Cookies müssen gelockert werden, damit der Login über verschiedene Domains hinweg funktioniert.]
+== Wechsel zur Same-Origin-Strategie
+#par[Die finale Systemarchitektur ist das Ergebnis eines iterativen Prozesses, der durch sicherheitstechnische Hürden bei der Kommunikation zwischen Frontend und Backend geprägt ist.]
+=== Problematik des hybriden Betriebs
+#par[Zunächst wird der Plan verfolgt, lediglich das Backend auf PythonAnywhere zu veröffentlichen, während das Frontend weiterhin in der lokalen Entwicklungsumgebung (localhost:3000) betrieben wird. Dieser hybride Ansatz soll es ermöglichen, Änderungen an der Benutzeroberfläche schnell zu testen, während bereits auf die produktive Datenbank zugegriffen wird. Dieser Aufbau erweist sich jedoch als technisch kaum realisierbar. Trotz umfangreicher Anpassungen der CORS-Header (django-cors-headers) blockieren moderne Browser die Kommunikation. Das Hauptproblem liegt in den strengen Sicherheitsrichtlinien für Cookies: Da das Backend über eine verschlüsselte HTTPS-Verbindung antwortet, das lokale Frontend jedoch über unverschlüsseltes HTTP läuft, werden die für den Login essenziellen Session-Cookies vom Browser verworfen.]
+=== Scheitern der lokalen HTTPS-Simulation
+#par[Um diese Diskrepanz zu beheben, wird versucht, die lokale Umgebung ebenfalls auf HTTPS umzustellen. Hierfür werden mittels OpenSSL eigene Sicherheitszertifikate erstellt und in den lokalen Entwicklungsserver eingebunden. Auch dieser Lösungsansatz führt nicht zum Erfolg. Da die selbst erstellten Zertifikate von Browsern nicht als vertrauenswürdig eingestuft werden, entstehen weiterhin Warnmeldungen und Blockaden bei den API-Anfragen. Der administrative Aufwand, um dem Browser diese Zertifikate „aufzuzwingen“, steht in keinem Verhältnis zum Nutzen.]
+=== Umsetzung der Same-Origin-Strategie
+#par[Aufgrund dieser persistierenden Komplikationen erfolgt eine strategische Änderung: Das Frontend wird ebenfalls auf die PythonAnywhere-Plattform migriert. Der kompilierte Frontend-Code wird auf den Server geladen und so konfiguriert, dass er unter derselben Domain wie das Backend ausgeliefert wird. Nach Anpassung der Pfade (Mapping der index.html auf die Root-URL) ist das System sofort voll funktionsfähig.
+Die technische Überlegenheit dieser Lösung basiert auf dem Same-Origin-Prinzip. In der vorherigen Konstellation stufte der Browser Frontend und Backend als unterschiedliche Ursprünge ein (Cross-Origin), da sie sich in Domain und Port unterschieden. Dies löste restriktive Sicherheitsprüfungen aus. Durch das Hosting auf demselben Server teilen sich Frontend und Backend nun:]
+- Das Protokoll (HTTPS)
+- Die Domain (michi22.pythonanywhere.com)
+- Den Port (443)
+#par[Da diese drei Parameter identisch sind, betrachtet der Browser die Kommunikation als vertrauenswürdig („Same-Origin“). Komplizierte Ausnahmeregeln für Cookies oder Preflight-Requests entfallen vollständig, was die Stabilität der Anwendung dauerhaft gewährleistet.]
+== Umgang mit technischen Einschränkungen (WebSockets)
+#par[Ein zentrales Feature der Applikation ist die Aktualisierung des Punktestandes ohne manuellen Reload der Seite, um den Spielfluss nicht zu unterbrechen. Das ursprüngliche Architekturkonzept sah hierfür die Nutzung von WebSockets (via Django Channels und Redis) vor. Diese Technologie ermöglicht eine bidirektionale, persistente Verbindung, über die der Server Änderungen in Echtzeit an den Client „pushen“ kann.]
+=== Technische Restriktionen der Hosting-Umgebung
+#par[Während der Inbetriebnahme auf PythonAnywhere stellte sich heraus, dass der gewählte kostenlose Hosting-Plan keine Unterstützung für den Redis-Server bietet. Da Redis als Message-Broker für Django Channels essenziell ist, führten die WebSocket-Handshakes zu Server-Fehlern (HTTP 500). Eine asynchrone Server-Push-Kommunikation war unter diesen infrastrukturellen Gegebenheiten somit nicht realisierbar.]
+=== Strategiewechsel: Client-Side Short-Polling
+#par[Um die Konsistenz der Punktestände dennoch zu gewährleisten, wurde die Architektur auf ein Client-Pull-Verfahren umgestellt. Konkret wurde ein Short-Polling-Mechanismus mittels JavaScript implementiert. Anstatt auf ein Signal des Servers zu warten, fragt der Browser nun aktiv in regelmäßigen Intervallen den aktuellen Status ab.
+Die technische Umsetzung erfolgt spezifisch in den Template-Dateien starting_page.html und blackjack.html. Dort wird die JavaScript-Funktion setInterval genutzt, um alle 3000 Millisekunden (3 Sekunden) eine asynchrone Anfrage an den API-Endpunkt zu senden. Der Code-Ablauf gestaltet sich wie folgt:]
+- Trigger: Die Funktion updatePointsPeriodically initiiert den Timer.
+- Request: Es erfolgt ein fetch-Aufruf an https://michi22.pythonanywhere.com/api/casino/session/.
+- Authentifizierung: Da Frontend und Backend auf derselben Domain liegen („Same-Origin“), wird der Session-Cookie automatisch mitgesendet und vom Server zur Identifikation des Nutzers verwendet.
+- Update: Die JSON-Antwort des Servers enthält den aktuellen Kontostand, welcher anschließend per DOM-Manipulation in die HTML-Anzeige injiziert wird.
+== Zusammenfassung der Architektur
+#par[Die finale Version auf PythonAnywhere ist eine stabile und wartbare Lösung. Statische Dateien und das Frontend werden direkt ausgeliefert, während die Geschäftslogik über die API läuft. Als Datenbank kommt das dateibasierte SQLite zum Einsatz, was für diese Projektgröße ideal ist. Der Prozess zeigt, dass Deployment mehr ist als nur das Kopieren von Dateien. Es erfordert das Verständnis für Server-Architekturen und die Fähigkeit, theoretische Konzepte flexibel an die realen technischen Möglichkeiten anzupassen.]
 #pagebreak()
 = Fazit und Ausblick
 #par[Abschließend lässt sich sagen, dass die Entwicklung der Webanwendung für das Studentencasino einen erfolgreichen Verlauf genommen hat, insbesondere in Bezug auf die Skalierbarkeit und Benutzerfreundlichkeit. Das Projekt hat es ermöglicht, die Herausforderungen moderner Webentwicklung zu meistern, insbesondere in der Implementierung von Echtzeit-Interaktionen und der sicheren Verwaltung von Benutzerdaten. Ein wesentlicher Aspekt war dabei die Einführung der Spielwährung „Coin“, die als zentrale Ressource die Interaktivität und den Wettbewerb zwischen den Nutzern fördert. Auch die modulare Struktur des Systems stellt sicher, dass zukünftige Erweiterungen, wie neue Spiele und Funktionen, problemlos integriert werden können.]
