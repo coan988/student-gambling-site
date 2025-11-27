@@ -1,6 +1,6 @@
 // Datei-Header: JS-Logik für die Startseite (Authentifizierung, UI, Interaktionen)
 // CSRF-Cookie vom Server anfordern (beim Start)
-fetch("http://localhost:8000/api/casino/session/", { credentials: "include" });
+fetch("/api/casino/session/", { credentials: "include" });
 
 // Funktion: getCookie(name)
 // Liest ein Cookie aus `document.cookie` aus und gibt den Wert des angegebenen
@@ -129,7 +129,7 @@ function updateUI(authenticated, userData = null) {
 // abgemeldeten Zustand versetzt.
 async function checkSession() {
   try {
-    const res = await fetch("http://localhost:8000/api/casino/session/", {
+    const res = await fetch("/api/casino/session/", {
       credentials: "include"
     });
     const data = await res.json();
@@ -161,7 +161,7 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
   const formData = Object.fromEntries(new FormData(e.target));
 
   try {
-    const response = await fetch("http://localhost:8000/api/casino/login/", {
+    const response = await fetch("/api/casino/login/", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -202,7 +202,7 @@ document.getElementById("registerForm").addEventListener("submit", async (e) => 
   const formData = Object.fromEntries(new FormData(e.target));
 
   try {
-    const response = await fetch("http://localhost:8000/api/casino/register/", {
+    const response = await fetch("/api/casino/register/", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -235,7 +235,7 @@ logoutBtn.addEventListener("click", async () => {
   const csrftoken = getCookie('csrftoken');
 
   try {
-    const res = await fetch("http://localhost:8000/api/casino/logout/", {
+    const res = await fetch("/api/casino/logout/", {
       method: "POST",
       credentials: "include",
       headers: {
