@@ -72,6 +72,19 @@
 
 #set page(margin: (top: 4cm, bottom: 2cm, left: 4cm, right: 2cm))
 
+//Kopfzeile - Verzeichnisse
+#counter(page).update(2)
+#set page(
+  header: context {
+    [
+      #h(1fr)
+      #if here().page() > 2 [
+        #counter(page).display()
+      ]
+    ]
+  },
+)
+
 //Inhaltsverzeichniss
 #outline(
   title: "Inhaltsverzeichnis",
@@ -79,18 +92,34 @@
 )
 #pagebreak()
 
-//Kopfzeile - Verzeichnisse
-#counter(page).update(3)
-#set page(
-  header: context {
-    [
-      #h(1fr)
-      #counter(page).display()
-    ]
-  },
-)
 //Abkürzungsverzeichnis
 = Abkürzungsverzeichnis
+#table(
+  columns: (1fr, 2fr),
+  inset: 10pt,
+  stroke: none,
+  [API], [Application Programming Interface],
+  [CORS], [Cross-Origin Resource Sharing],
+  [CSRF], [Cross-Site Request Forgery],
+  [CSS], [Cascading Style Sheets],
+  [DMZ], [Demilitarisierte Zone],
+  [DNS], [Domain Name System],
+  [ERM], [Entity-Relationship-Modell],
+  [ORM], [Object-Relational Mapping],
+  [PaaS], [Platform as a Service],
+  [HTML], [Hypertext Markup Language],
+  [HTTP], [Hypertext Transfer Protocol],
+  [HTTPS], [Hypertext Transfer Protocol Secure],
+  [IP], [Internet Protocol],
+  [JSON], [JavaScript Object Notation],
+  [REST], [Representational State Transfer],
+  [SOP], [Same-Origin Policy],
+  [SQLite], [Structured Query Language lite],
+  [SSL], [Secure Sockets Layer],
+  [UI], [User Interface],
+  [URL], [Uniform Resource Locator],
+  [VPS], [Virtual Private Server],
+)
 #pagebreak()
 
 //Abbildungsverzeichnis
@@ -221,9 +250,8 @@
 == Technologie-Stack
 == Komponentenstruktur
 #pagebreak()
-= Hosting
-#par[Evaluierung der Hosting-Strategie und Umsetzung der Systemarchitektur
-Der Übergang von einer lokalen Entwicklungsumgebung hin zu einem produktiven System ist ein entscheidender Schritt in der Softwareentwicklung. Dieses Kapitel beleuchtet den Deployment-Prozess der Casino-Applikation. Dabei stehen nicht nur die technischen Schritte im Vordergrund, sondern auch die Auswahl der passenden Infrastruktur, der Umgang mit Sicherheitsanforderungen sowie die Anpassung der Software an die Gegebenheiten der Hosting-Plattform.]
+= Evaluierung der Hosting-Strategie und Umsetzung der Systemarchitektur
+#par[Der Übergang von einer lokalen Entwicklungsumgebung hin zu einem produktiven System ist ein entscheidender Schritt in der Softwareentwicklung. Dieses Kapitel beleuchtet den Deployment-Prozess der Casino-Applikation. Dabei stehen nicht nur die technischen Schritte im Vordergrund, sondern auch die Auswahl der passenden Infrastruktur, der Umgang mit Sicherheitsanforderungen sowie die Anpassung der Software an die Gegebenheiten der Hosting-Plattform.]
 == Anforderungsanalyse und Ziel der Veröffentlichung
 #par[Bereits zu Beginn des Projekts wird festgelegt, dass die Anwendung nicht auf die lokale Umgebung („localhost“) beschränkt bleiben soll. Das Ziel ist es, die Webanwendung öffentlich über das Internet zugänglich zu machen. Dies erfüllt zwei wesentliche Funktionen: Zum einen lässt sich so eine realistische Nutzungssituation simulieren, zum anderen kann überprüft werden, wie sich das System verhält, wenn mehrere Nutzer von extern darauf zugreifen. Erst dieser Schritt belegt, dass das entwickelte Django-Backend und das Frontend stabil zusammenarbeiten.]
 === Analyse der Option Self-Hosting
